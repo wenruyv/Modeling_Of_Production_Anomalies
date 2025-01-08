@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Eureka_Server/Eureka_Server.iml" filepath="$PROJECT_DIR$/Eureka_Server/Eureka_Server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Modeling_Of_Production_Anomalies/Modeling_Of_Production_Anomalies.iml" filepath="$PROJECT_DIR$/Modeling_Of_Production_Anomalies/Modeling_Of_Production_Anomalies.iml" />
+      <module fileurl="file://$PROJECT_DIR$/flowable-ui/flowable-ui.iml" filepath="$PROJECT_DIR$/flowable-ui/flowable-ui.iml" />
+    </modules>
+  </component>
+</project>
