@@ -2,9 +2,14 @@
   <div class="ordering">
   <div class="containers">
     <!-- 返回主页按钮 -->
-    <el-button type="primary" round class="back-home-button" @click="goBackHome">
-      返回主页
+    <el-button
+        type="text"
+        class="back-home-button"
+        @click="goBackHome"
+    >
+      <el-icon class="arrow-icon"><ArrowLeft /></el-icon>
     </el-button>
+
     <!-- 给画布添加鼠标事件监听 -->
     <div
         class="canvas"
@@ -27,6 +32,7 @@ import { intelligentProductionXML } from '@/mock/intelligentProduction';
 import { intelligentServiceXML } from '@/mock/intelligentService';
 import { interactiveCustomizationXML } from '@/mock/interactiveCustomization';
 import { precisionMarketingXML } from '@/mock/precisionMarketing';
+import { ArrowLeft } from '@element-plus/icons-vue';
 import { xmlStr } from '@/mock/xmlStr';
 
 // 定义响应式数据
@@ -186,5 +192,14 @@ onMounted(init);
   top: 10px;
   left: 10px;
   z-index: 10;
+}
+.back-home-button {
+   padding: 0;
+   border: none; /* 去掉按钮边框 */
+   background: none; /* 去掉按钮背景 */
+ }
+.arrow-icon {
+  font-size: 16px; /* 图标大小，可根据需求调整 */
+  color: rgba(0, 0, 139, 1); /* 深蓝色透明，可根据需求调整颜色和透明度 */
 }
 </style>

@@ -19,26 +19,26 @@
           >保存为XML文件</a
         >
       </li>
-      <li>
-        <a href="javascript:" @click="saveSVG" title="保存为svg"
-          >保存为SVG图片</a
-        >
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerUndo" title="撤销操作">撤销</a>
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerRedo" title="恢复操作">恢复</a>
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerZoom(0.1)" title="放大">放大</a>
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerZoom(-0.1)" title="缩小">缩小</a>
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerZoom(0)" title="还原">还原</a>
-      </li>
+<!--      <li>-->
+<!--        <a href="javascript:" @click="saveSVG" title="保存为svg"-->
+<!--          >保存为SVG图片</a-->
+<!--        >-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <a href="javascript:" @click="handlerUndo" title="撤销操作">撤销</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <a href="javascript:" @click="handlerRedo" title="恢复操作">恢复</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <a href="javascript:" @click="handlerZoom(0.1)" title="放大">放大</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <a href="javascript:" @click="handlerZoom(-0.1)" title="缩小">缩小</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <a href="javascript:" @click="handlerZoom(0)" title="还原">还原</a>-->
+<!--      </li>-->
     </ul>
   </div>
     </div >
