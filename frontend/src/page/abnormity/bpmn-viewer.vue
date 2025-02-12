@@ -6,6 +6,7 @@
         type="text"
         class="back-home-button"
         @click="goBackHome"
+        title = "返回主页"
     >
       <el-icon class="arrow-icon"><ArrowLeft /></el-icon>
     </el-button>
