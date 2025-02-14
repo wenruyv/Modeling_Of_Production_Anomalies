@@ -52,7 +52,7 @@ export default {
         //菜单激活回调
         const ac_index = ref('1')
         function select(index,path){
-            console.log(index)
+            // console.log(index)
             localStorage.setItem('menuId',JSON.stringify(index))
         }
         onMounted(()=>{

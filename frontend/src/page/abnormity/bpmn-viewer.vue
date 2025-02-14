@@ -35,6 +35,7 @@ import { interactiveCustomizationXML } from '@/mock/interactiveCustomization';
 import { precisionMarketingXML } from '@/mock/precisionMarketing';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { xmlStr } from '@/mock/xmlStr';
+import axios from "axios";
 
 // 定义响应式数据
 const bpmnViewer = ref(null);
@@ -43,16 +44,33 @@ const canvas = ref(null);
 const isDragging = ref(false);
 const startX = ref(0);
 const startY = ref(0);
-const xmlStrRef = ref(main);
+const xmlStrRef = ref();
+const xmlName = ref('main')
 
 // 初始化方法
-const init = () => {
+const init = async () => {
   canvas.value = document.querySelector('.canvas');
   bpmnViewer.value = new BpmnViewer({
     container: canvas.value
   });
 
-  createNewDiagram();
+  // 调用获取XML数据的方法
+  await fetchXmlData(xmlName.value);
+
+  await createNewDiagram();
+};
+
+// 获取后端XML数据的方法
+const fetchXmlData = async (xmlName) => {
+  try {
+    const url = `bpmn-xml/findByName/${xmlName}`;
+    const response = await axios.get(url);
+    // 假设后端返回的XML数据在响应的data字段中
+    xmlStrRef.value = response.data.data;
+    // console.log(xmlStrRef.value);
+  } catch (error) {
+    console.error('获取XML数据时出错:', error);
+  }
 };
 
 // 创建新图表方法
