@@ -2,10 +2,10 @@
     <div class='sidebar-top'>
         <!-- 顶部栏 -->
         <div>生产要素异常管理</div>
-        <div>退出</div>
+        <div >退出</div>
     </div>
     <div class="sidebar-cont">
-        <el-menu :default-active="ac_index" @select="select">
+        <el-menu ><!--:default-active="ac_index" @select="select"去掉菜单激活回调-->
             <div v-for="(item,index) in menu" :key="index">
                 <router-link :to="{path:item.router}">
                     <el-menu-item v-if="item.Subclass.length === 0" :index="item.id">
@@ -50,55 +50,73 @@ export default {
     setup(){
 
         //菜单激活回调
-        const ac_index = ref('1')
-        function select(index,path){
-            console.log(index)
-            localStorage.setItem('menuId',JSON.stringify(index))
-        }
-        onMounted(()=>{
-            ac_index.value = JSON.parse(localStorage.getItem('menuId'))
-        })
+        // const ac_index = ref('1')
+        // function select(index,path){
+        //     console.log(index)
+        //     localStorage.setItem('menuId',JSON.stringify(index))
+        // }
+        // onMounted(()=>{
+        //     ac_index.value = JSON.parse(localStorage.getItem('menuId'))
+        // })
         //遍历侧边栏
       const menu = [
           {
             id: '1',
             icon: User,
-            title: '生产组织',
-            router: 'organization',
+            title: '账户管理',
+            router: 'user',
             Subclass: []//是否有二级菜单
           },
           {
             id: '2',
+            icon: User,
+            title: '生产组织',
+            router: '',
+            Subclass: [
+              {
+                id: '2.1',
+                title: '生产组织',
+                router: 'organization',
+              },
+              {
+                id: '2.2',
+                title: '添加公司',
+                router: 'addCompany',
+              }
+            ]//是否有二级菜单
+          },
+          {
+            id: '3',
             icon: Box,
             title: '生产资源',
             router: 'resource',
             Subclass: []//是否有二级菜单
           },
           {
-            id: '3',
+            id: '4',
             icon: Document,
             title: '生产信息',
             router: 'information',
             Subclass: []//是否有二级菜单
           },
           {
-            id: '4',
+            id: '5',
             icon: WarningFilled,
             title: '异常建模',
             router: '',
             Subclass: [
               {
-                id: '4.1',
+                id: '5.1',
                 title: '异常分类',
                 router: 'class',
               },
               {
-                id: '4.2',
+                id: '5.2',
                 title: '流程查看器',
                 router: 'bpmn-viewer',
               },
               {
-                id: '4.3',
+                id: '5.3',
                 title: '流程建模器',
                 router: 'bpmn-modeler',
               }
@@ -106,7 +124,7 @@ export default {
           }
         ]
 
-        return {menu,ac_index,select}
+        return {menu}
     }
 }
 </script>

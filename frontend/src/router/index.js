@@ -2,20 +2,30 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 
 const routes = [
     {
-        path: '/login',
+        path: '/',
         name: 'login',
         component: () => import('@/page/login/login.vue')
     },
     {
-        path: '/',
+        path: '/index',
         name: 'index',
         component: () => import('@/page/index/index.vue'),
-        redirect: '/organization', // 修改为绝对路径
+        redirect: '/user', // 修改为绝对路径
         children: [
+            {
+                path: '/user', //
+                name: 'user',
+                component: () => import('@/page/user/user.vue')
+            },
             {
                 path: '/organization', //
                 name: 'organization',
                 component: () => import('@/page/organization/organization.vue')
+            },
+            {
+                path: '/addCompany', //
+                name: 'addCompany',
+                component: () => import('@/page/organization/addCompany.vue')
             },
             {
                 path: '/resource', //

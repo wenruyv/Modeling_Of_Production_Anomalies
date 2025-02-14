@@ -1,20 +1,28 @@
 //接口文档
-
-const url = 'http://element.thexxdd.cn/api/'
+const url = 'http://localhost:8081/'
 
 const urls = class{
     static m(){//静态方法
         //注册接口
         const register = `${url}register`
         //登录接口
-        const login = `${url}login`
-        //生产组织列表
-        const organization = `${url}pulluserlist`
+        const login = `${url}user/login`
+        //用户列表
+        const user = `${url}user/list`
+        //生产组织
+        const organization = `${url}organization/list`
+        //添加公司
+        const add_company = `${url}organization/addCompany`
+        //异常分类列表
+        const ab_class = `${url}abnormal/list`
 
         return {
             register,
             login,
-            organization
+            user,
+            organization,
+            add_company,
+            ab_class
         }
     }
 

@@ -1,0 +1,7 @@
+package com.example.modeling_of_production_anomalies.service;
+
+import com.example.modeling_of_production_anomalies.entity.Company;
+
+public interface OrganizationService {
+    int addCompany(Company company);
+}

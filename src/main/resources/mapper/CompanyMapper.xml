@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.CompanyMapper">
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.Company">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="LONGVARCHAR" property="name"/>
+        <result column="location" jdbcType="LONGVARCHAR" property="location"/>
+        <result column="established_date" jdbcType="LONGVARCHAR" property="established_date"/>
+        <result column="type" jdbcType="LONGVARCHAR" property="type"/>
+        <result column="phone" jdbcType="LONGVARCHAR" property="phone"/>
+        <result column="email" jdbcType="LONGVARCHAR" property="email"/>
+        <result column="ceo_name" jdbcType="LONGVARCHAR" property="ceo_name"/>
+        <result column="web" jdbcType="LONGVARCHAR" property="web"/>
+        <result column="c_username" jdbcType="LONGVARCHAR" property="c_username"/>
+        <result column="c_password" jdbcType="LONGVARCHAR" property="c_password"/>
+        <result column="introduction" jdbcType="LONGVARCHAR" property="introduction"/>
+
+    </resultMap>
+    <select id="companyList" resultMap="BaseResultMap">
+        select * from company
+    </select>
+
+    <insert id="addCompany">
+        insert into company (id,name,location,established_date,type,phone,email,ceo_name,web,c_username,c_password,introduction)
+        values (#{id},#{name},#{location},#{established_date},#{type},#{phone},#{email},#{ceo_name},#{web},#{c_username},#{c_password},#{introduction})
+    </insert>
+
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.User">
+        <id column="user_id" jdbcType="INTEGER" property="user_id"/>
+        <result column="username" jdbcType="LONGVARCHAR" property="username"/>
+        <result column="password" jdbcType="LONGVARCHAR" property="password"/>
+        <result column="user_type" jdbcType="LONGVARCHAR" property="user_type"/>
+    </resultMap>
+    <select id="findByUsername" resultMap="BaseResultMap">
+        select * from user where username =#{username}
+    </select>
+
+    <select id="UserList" resultMap="BaseResultMap">
+        select * from user
+    </select>
+
+</mapper>
