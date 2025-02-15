@@ -18,5 +18,8 @@
     <select id="UserList" resultMap="BaseResultMap">
         select * from user
     </select>
+    <insert id="addCuser">
+        insert into user (username,password,user_type) values (#{username},#{password},#{user_type})
+    </insert>
 
 </mapper>

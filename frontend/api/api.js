@@ -16,6 +16,10 @@ const urls = class{
         //异常分类列表
         const ab_class = `${url}abnormal/list`
 
+        //根据企业管理员获得相应公司信息
+        const loadCompany = `${url}companyInfo`
+
+
         return {
             register,
             login,

@@ -13,5 +13,6 @@ public interface UserMapper {
     User findByUsername(String username);
     //列表展示
     List<User> UserList();
+    int addCuser(User user);
 
 }

@@ -2,7 +2,7 @@
     <div class='sidebar-top'>
         <!-- 顶部栏 -->
         <div>生产要素异常管理</div>
-        <div >退出</div>
+        <div @click="exit">退出</div>
     </div>
     <div class="sidebar-cont">
         <el-menu ><!--:default-active="ac_index" @select="select"去掉菜单激活回调-->
@@ -43,12 +43,12 @@
 <script>
 import {Box, Document, User, WarningFilled} from '@element-plus/icons-vue'
 import {onMounted, ref} from 'vue';
-
+import { useRouter  } from 'vue-router'
 export default {
     components:{User,Box,Document,WarningFilled},
 
     setup(){
-
+      const router = useRouter ()
         //菜单激活回调
         // const ac_index = ref('1')
         // function select(index,path){
@@ -123,8 +123,10 @@ export default {
             ]//是否有二级菜单
           }
         ]
-
-        return {menu}
+      function exit(){
+        router.push({name:'login'});
+      }
+        return {menu,exit}
     }
 }
 </script>

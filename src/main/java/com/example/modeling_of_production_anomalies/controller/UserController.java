@@ -18,7 +18,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user){
+    public User login(@RequestBody User user){
         System.out.println(user);
         String username = user.getUsername();
         String password = user.getPassword();
@@ -28,14 +28,13 @@ public class UserController {
         System.out.println(user);
         if (u == null) {
             System.out.println("用户名不存在或错误");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("用户名不存在或错误");
+            return null;
         }
-
         // 验证密码
         if (password.equals(u.getPassword())) {
-            return ResponseEntity.status(HttpStatus.OK).body("登录成功");
+            return u;
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("密码错误");
+            return null;
         }
         // 如果密码不匹配，则返回密码错误信息
     }

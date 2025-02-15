@@ -32,30 +32,27 @@ export default {
     const user = reactive({
       account:'',
       password:'',
-      regi:'注册',
-      load:false
+
     })
     async function login(){
-      user.load = true
+
       //window.location.href = '/'
       const obj = {username:user.account,password:user.password}
       try {
         const res = await new proxy.$request(proxy.$urls.m().login,obj).modepost()
-
-        if(res.status!=200){
-          new proxy.$tips(res.data.msg,'warning').message_()
-
-        }else{
-          //跳转页面
-          router.push({name:'index'})
-          //token缓存到本地
-          localStorage.setItem('token',res.data.data.token)
+        console.log(res);
+        if (res.data) {
+          new proxy.$tips('登陆成功', 'success').message_();
+          if(res.data.user_type == 1){
+            await router.push({name:'index'})
+          }else if(res.data.user_type == 2){
+            await router.push({name:'comIndex'})
+          }
+         }else{
+             new proxy.$tips('用户名或密码错误', 'error').message_();
         }
-        user.load = false
       } catch (error) {
-        // console.log("发生错误")
-        user.load = false
-        //new proxy.$tips('服务器发生错误','error').message_()
+        new proxy.$tips('服务器发生错误','error').message_()
       }
     }
 

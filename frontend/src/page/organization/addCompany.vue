@@ -33,6 +33,8 @@
                   v-model="company.established_date"
                   type="date"
                   placeholder="请选择日期"
+                  format="YYYY/MM/DD"
+                  value-format="YYYY-MM-DD"
                   style="width: 100%"
               />
             </el-form-item>
@@ -64,12 +66,12 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="企业管理员账号" prop="c_username">
+            <el-form-item label="管理员账号" prop="c_username">
               <el-input v-model="company.c_username" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="企业管理员密码" prop="c_password">
+            <el-form-item label="管理员密码" prop="c_password">
               <el-input v-model="company.c_password" />
             </el-form-item>
           </el-col>
@@ -121,7 +123,7 @@ export default{
     const onSubmit = async () => {
       try {
         const valid = await proxy.$refs.companyForm.validate();
-        console.log(valid);
+        console.log("表单验证结果" + valid);
         if (!valid) {
           return;  // 如果验证失败，直接返回
         }

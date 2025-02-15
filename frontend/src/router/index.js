@@ -53,6 +53,19 @@ const routes = [
                 component: () => import('@/page/abnormity/bpmn-modeler')
             }
         ]
+    },
+    {   //企业index
+        path: '/comIndex',
+        name: 'comIndex',
+        component: () => import('@/page/comPage/comIndex.vue'),
+        redirect: '/companyInfo', // 修改为绝对路径
+        children: [
+            {
+                path: '/companyInfo', //企业信息
+                name: 'companyInfo',
+                component: () => import('@/page/comPage/comInfo.vue')
+            }
+        ]
     }
 ];
 
