@@ -35,7 +35,7 @@ const isDragging = ref(false);
 const startX = ref(0);
 const startY = ref(0);
 const xmlStrRef = ref();
-const xmlName = ref('main')
+const xmlId = ref(2)
 
 // 初始化方法
 const init = async () => {
@@ -45,15 +45,15 @@ const init = async () => {
   });
 
   // 调用获取XML数据的方法
-  await fetchXmlData(xmlName.value);
+  await fetchXmlData(xmlId.value);
 
   await createNewDiagram();
 };
 
 // 获取后端XML数据的方法
-const fetchXmlData = async (xmlName) => {
+const fetchXmlData = async (Id) => {
   try {
-    const url = `bpmn-xml/findByName/${xmlName}`;
+    const url = `bpmn-xml/findById/${Id}`;
     const response = await axios.get(url);
     // 假设后端返回的XML数据在响应的data字段中
     xmlStrRef.value = response.data.data;
@@ -150,7 +150,7 @@ const changeXML = async (elementType, elementName) => {
     // 导入新的 XML 数据
     try {
       xmlStrComp(elementName);
-      await fetchXmlData(xmlName.value);
+      await fetchXmlData(xmlId.value);
       const result = await bpmnViewer.value.importXML(xmlStrRef.value);
       const { warnings } = result;
       console.log(warnings);
@@ -166,17 +166,17 @@ const changeXML = async (elementType, elementName) => {
 
 // xmlStr的相关匹配
 const xmlStrComp = (elementName) => {
-  if (elementName === '交互定制') xmlName.value = 'interactiveCustomizationXML';
+  if (elementName === '交互定制') xmlId.value = 7;
   else if (elementName === '研发创新')
-    xmlName.value = 'developmentInnovationXML';
-  else if (elementName === '精准营销') xmlName.value = 'precisionMarketingXML';
+    xmlId.value = 3;
+  else if (elementName === '精准营销') xmlId.value = 8;
   else if (elementName === '协同采购')
-    xmlName.value = 'collaborativePurchasingXML';
+    xmlId.value = 1;
   else if (elementName === '智能生产')
-    xmlName.value = 'intelligentProductionXML';
-  else if (elementName === '智慧物流') xmlName.value = 'intelligentLogisticsXML';
-  else if (elementName === '智慧服务') xmlName.value = 'intelligentServiceXML';
-  else if (elementName === '主页') xmlName.value = 'main';
+    xmlId.value = 5;
+  else if (elementName === '智慧物流') xmlId.value = 4;
+  else if (elementName === '智慧服务') xmlId.value = 6;
+  else if (elementName === '主页') xmlId.value = 2;
 };
 
 // 挂载时调用初始化方法

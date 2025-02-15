@@ -41,6 +41,7 @@ const canvas = ref(null);
 const refFile = ref(null);
 const xmlName = ref('empty');
 const xmlStrRef = ref();
+const xmlId = ref(9);
 const selectedOption = ref('');
 
 // 定义响应式数据
@@ -52,7 +53,7 @@ const state = reactive({
 
 const saveChange = async () => {
   try {
-    console.log(selectedOption.value);
+    // console.log(selectedOption.value);
 
     // 获取最新的 XML 代码
     const result = await state.bpmnModeler.saveXML({ format: true });
@@ -74,25 +75,32 @@ const openXml = async (value) => {
   // 假设每个选项对应不同的 XML 字符串，你可以根据实际情况修改
   switch (value) {
     case 'interactiveCustomizationXML':
-      xmlName.value = 'interactiveCustomizationXML';
+      xmlName.value = 'interactiveCustomizationXML'
+      xmlId.value = 7;
       break;
     case 'developmentInnovationXML':
-      xmlName.value = 'developmentInnovationXML';
+      xmlName.value = 'developmentInnovationXML'
+      xmlId.value = 3;
       break;
     case 'precisionMarketingXML':
-      xmlName.value = 'precisionMarketingXML';
+      xmlName.value = 'precisionMarketingXML'
+      xmlId.value = 8;
       break;
     case 'collaborativePurchasingXML':
-      xmlName.value = 'collaborativePurchasingXML';
+      xmlName.value = 'collaborativePurchasingXML'
+      xmlId.value = 1;
       break;
     case 'intelligentProductionXML':
-      xmlName.value = 'intelligentProductionXML';
+      xmlName.value = 'intelligentProductionXML'
+      xmlId.value = 5;
       break;
     case 'intelligentLogisticsXML':
-      xmlName.value = 'intelligentLogisticsXML';
+      xmlName.value = 'intelligentLogisticsXML'
+      xmlId.value = 4;
       break;
     case 'intelligentServiceXML':
-      xmlName.value = 'intelligentServiceXML';
+      xmlName.value = 'intelligentServiceXML'
+      xmlId.value = 6;
       break;
     default:
       xmlName.value = 'empty';
@@ -101,7 +109,7 @@ const openXml = async (value) => {
   state.bpmnModeler.clear();
   // 导入新的 XML 数据
   try {
-    await fetchXmlData(xmlName.value);
+    await fetchXmlData(xmlId.value);
     const result = await state.bpmnModeler.importXML(xmlStrRef.value);
     const {warnings} = result;
     console.log(warnings);
@@ -124,15 +132,15 @@ const init = async () => {
   });
 
   // 调用获取XML数据的方法
-  await fetchXmlData(xmlName.value);
+  await fetchXmlData(xmlId.value);
 
   await createNewDiagram();
 };
 
 // 获取后端XML数据的方法
-const fetchXmlData = async (xmlName) => {
+const fetchXmlData = async (xmlId) => {
   try {
-    const url = `bpmn-xml/findByName/${xmlName}`;
+    const url = `bpmn-xml/findById/${xmlId}`;
     const response = await axios.get(url);
     // 假设后端返回的XML数据在响应的data字段中
     xmlStrRef.value = response.data.data;
