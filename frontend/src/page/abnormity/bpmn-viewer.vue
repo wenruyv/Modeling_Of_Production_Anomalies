@@ -3,7 +3,6 @@
   <div class="containers">
     <!-- 返回主页按钮 -->
     <el-button
-        type="text"
         class="back-home-button"
         @click="goBackHome"
         title = "返回主页"
@@ -25,16 +24,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import BpmnViewer from 'bpmn-js/lib/Viewer';
-import { main } from '@/mock/main';
-import { collaborativePurchasingXML } from '@/mock/collaborativePurchasing';
-import { developmentInnovationXML } from '@/mock/developmentInnovation';
-import { intelligentLogisticsXML } from '@/mock/intelligentLogistics';
-import { intelligentProductionXML } from '@/mock/intelligentProduction';
-import { intelligentServiceXML } from '@/mock/intelligentService';
-import { interactiveCustomizationXML } from '@/mock/interactiveCustomization';
-import { precisionMarketingXML } from '@/mock/precisionMarketing';
 import { ArrowLeft } from '@element-plus/icons-vue';
-import { xmlStr } from '@/mock/xmlStr';
 import axios from "axios";
 
 // 定义响应式数据
@@ -160,6 +150,7 @@ const changeXML = async (elementType, elementName) => {
     // 导入新的 XML 数据
     try {
       xmlStrComp(elementName);
+      await fetchXmlData(xmlName.value);
       const result = await bpmnViewer.value.importXML(xmlStrRef.value);
       const { warnings } = result;
       console.log(warnings);
@@ -175,17 +166,17 @@ const changeXML = async (elementType, elementName) => {
 
 // xmlStr的相关匹配
 const xmlStrComp = (elementName) => {
-  if (elementName === '交互定制') xmlStrRef.value = interactiveCustomizationXML;
+  if (elementName === '交互定制') xmlName.value = 'interactiveCustomizationXML';
   else if (elementName === '研发创新')
-    xmlStrRef.value = developmentInnovationXML;
-  else if (elementName === '精准营销') xmlStrRef.value = precisionMarketingXML;
+    xmlName.value = 'developmentInnovationXML';
+  else if (elementName === '精准营销') xmlName.value = 'precisionMarketingXML';
   else if (elementName === '协同采购')
-    xmlStrRef.value = collaborativePurchasingXML;
+    xmlName.value = 'collaborativePurchasingXML';
   else if (elementName === '智能生产')
-    xmlStrRef.value = intelligentProductionXML;
-  else if (elementName === '智慧物流') xmlStrRef.value = intelligentLogisticsXML;
-  else if (elementName === '智慧服务') xmlStrRef.value = intelligentServiceXML;
-  else if (elementName === '主页') xmlStrRef.value = main;
+    xmlName.value = 'intelligentProductionXML';
+  else if (elementName === '智慧物流') xmlName.value = 'intelligentLogisticsXML';
+  else if (elementName === '智慧服务') xmlName.value = 'intelligentServiceXML';
+  else if (elementName === '主页') xmlName.value = 'main';
 };
 
 // 挂载时调用初始化方法

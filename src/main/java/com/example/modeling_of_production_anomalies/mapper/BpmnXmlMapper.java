@@ -34,7 +34,7 @@ public interface BpmnXmlMapper {
      * @param bpmnXml 包含新xmlData和name的实体
      * @return 更新影响的行数
      */
-    @Update("UPDATE bpmn_xml SET xmlData = #{xmlData} WHERE name = #{name}")
+    @Update("UPDATE bpmn_xml SET data = #{data} WHERE name = #{name}")
     int updateXmlDataByName(BpmnXml bpmnXml);
 
     /**
