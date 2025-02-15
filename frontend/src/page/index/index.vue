@@ -76,7 +76,7 @@ export default {
               {
                 id: '2.1',
                 title: '生产组织',
-                router: 'organization',
+                router: 'org',
               },
               {
                 id: '2.2',

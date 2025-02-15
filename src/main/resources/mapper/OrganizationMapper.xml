@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.OrganizationMapper">
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.Organization">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="company" jdbcType="LONGVARCHAR" property="company"/>
+        <result column="department" jdbcType="LONGVARCHAR" property="department"/>
+        <result column="group" jdbcType="LONGVARCHAR" property="group"/>
+        <result column="position" jdbcType="LONGVARCHAR" property="position"/>
+
+    </resultMap>
+    <select id="orgList" resultMap="BaseResultMap">
+        select * from organization
+    </select>
+
+</mapper>

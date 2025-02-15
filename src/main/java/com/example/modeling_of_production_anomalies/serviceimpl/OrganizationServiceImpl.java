@@ -1,15 +1,26 @@
 package com.example.modeling_of_production_anomalies.serviceimpl;
 
 import com.example.modeling_of_production_anomalies.entity.Company;
+import com.example.modeling_of_production_anomalies.entity.Organization;
 import com.example.modeling_of_production_anomalies.mapper.CompanyMapper;
+import com.example.modeling_of_production_anomalies.mapper.OrganizationMapper;
 import com.example.modeling_of_production_anomalies.service.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private CompanyMapper companyMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+
+    @Override
+    public List<Organization> orgList() {
+        return organizationMapper.orgList();
+    }
 
     @Override
     public int addCompany(Company company) {
@@ -28,4 +39,5 @@ public class OrganizationServiceImpl implements OrganizationService {
         // 根据公司ID或其他唯一标识更新公司信息
         return companyMapper.updateCompany(company);
     }
+
 }

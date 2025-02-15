@@ -23,6 +23,11 @@ const routes = [
                 component: () => import('@/page/organization/organization.vue')
             },
             {
+                path: '/org', //树状图？？？
+                name: 'org',
+                component: () => import('@/page/organization/org.vue')
+            },
+            {
                 path: '/addCompany', //
                 name: 'addCompany',
                 component: () => import('@/page/organization/addCompany.vue')

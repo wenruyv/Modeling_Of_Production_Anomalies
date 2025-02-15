@@ -2,43 +2,56 @@
   <div class="ordering">
     <div class="heading">生产组织结构图</div>
     <div>
-      <el-table :data="org_array" style="width: 100%">
-        <el-table-column prop="user_id" label="id" min-width="100" />
-        <el-table-column prop="username" label="用户名" min-width="100" />
-        <el-table-column prop="password" label="密码" min-width="100"/>
-        <el-table-column prop="user_type" label="用户类型" min-width="100" :formatter="formatUserType"/>
+      <el-table :data="paginatedData" style="width: 100%">
+        <el-table-column prop="company" label="公司" min-width="100" />
+        <el-table-column prop="department" label="部门" min-width="100" />
+        <el-table-column prop="group" label="小组" min-width="100"/>
+        <el-table-column prop="position" label="职位" min-width="100" />
       </el-table>
-      <el-pagination background layout="prev, pager, next" :total="total" :current-page="1"
-                     @current-change="currentchange"
-                     :hide-on-single-page="true" />
+      <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="total"
+          :current-page="page"
+          :page-size="pageSize"
+          @current-change="currentChange"
+          :hide-on-single-page="true"
+      />
     </div>
 
   </div>
 </template>
 
 <script>
-import { reactive,onMounted,getCurrentInstance, toRefs } from 'vue';
+import {reactive, onMounted, getCurrentInstance, toRefs, computed} from 'vue';
 export default{
   setup(){
     const {proxy} = getCurrentInstance()
     //请求数据
     onMounted(()=>{
-      suserlist()
+      orgList()
     })
 
     const org_data = reactive({
       org_array: [],//数据
-      total: 0,//总条数
-      page: 0,
+      total: 0, // 总条数
+      page: 1, // 当前页码
+      pageSize: 10, // 每页条数
     })
-    async function suserlist(){
+    // 计算当前页的数据
+    const paginatedData = computed(() => {
+      const start = (org_data.page - 1) * org_data.pageSize;
+      const end = start + org_data.pageSize;
+      return org_data.org_array.slice(start, end);
+    });
+    async function orgList(){
       try {
         const res = await new proxy.$request(proxy.$urls.m().organization).modeget()
         console.log(res)
         // 假设返回的res包含数据对象data和总条数total
         if (res && res.data && Array.isArray(res.data)) {
           // 更新组织数据
-          org_data.user_array = res.data;
+          org_data.org_array = res.data;
           org_data.total = res.data.length || 0; // 更新总条数
         } else {
           new proxy.$tips('数据格式不正确', 'error').message_();
@@ -48,25 +61,11 @@ export default{
         new proxy.$tips('服务器发生错误','error').message_()
       }
     }
-    function formatUserType(row, column, cellValue, index) {
-      switch (cellValue) {
-        case 1:
-          return "系统管理员";
-        case 2:
-          return "企业管理员";
-        case 3:
-          return "部门管理员";
-        default:
-          return "未知";
-      }
+    // 分页触发事件
+    function currentChange(e) {
+      org_data.page = e; // 更新页码
     }
-
-    //分页出发事件
-    function currentchange(e){
-      console.log(e - 1)
-      org_data.page = e-1
-    }
-    return {...toRefs(org_data),currentchange,formatUserType}
+    return {...toRefs(org_data),paginatedData,currentChange}
   }
 
 }

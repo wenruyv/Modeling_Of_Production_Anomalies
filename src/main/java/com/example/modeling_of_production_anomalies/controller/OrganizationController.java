@@ -1,11 +1,14 @@
 package com.example.modeling_of_production_anomalies.controller;
 
 import com.example.modeling_of_production_anomalies.entity.Company;
+import com.example.modeling_of_production_anomalies.entity.Organization;
 import com.example.modeling_of_production_anomalies.entity.User;
 import com.example.modeling_of_production_anomalies.service.OrganizationService;
 import com.example.modeling_of_production_anomalies.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/organization")
@@ -16,6 +19,12 @@ public class OrganizationController {
     private OrganizationService organizationService;
     @Autowired
     private UserService userService;
+    @RequestMapping("/list")
+    public List<Organization> getOrgList(){
+        List<Organization> list = organizationService.orgList();
+        System.out.println(list);
+        return list;
+    }
     @PostMapping("/addCompany")
     public int addCompany(@RequestBody Company company){
         int newCom = organizationService.addCompany(company);
