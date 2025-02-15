@@ -34,4 +34,18 @@ public class OrganizationController {
 
         return newCom;
     }
+    @GetMapping("/companyInfo")
+    public Company companyInfoByUsername(@RequestParam String c_username){
+        Company company = organizationService.selectByC_username(c_username);
+        return company;
+    }
+    @PostMapping("/updateCompany")
+    public int updateCompany(@RequestBody Company company) {
+        int result = organizationService.updateCompany(company);
+        if (result == 1) {
+            return result;
+        } else {
+            return 0;
+        }
+    }
 }

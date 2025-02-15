@@ -42,12 +42,15 @@ export default {
         const res = await new proxy.$request(proxy.$urls.m().login,obj).modepost()
         console.log(res);
         if (res.data) {
-          new proxy.$tips('登陆成功', 'success').message_();
+
           if(res.data.user_type == 1){
             await router.push({name:'index'})
           }else if(res.data.user_type == 2){
+            // 保存账户信息到 localStorage
+            localStorage.setItem('c_username', res.data.username);
             await router.push({name:'comIndex'})
           }
+          new proxy.$tips('登陆成功', 'success').message_();
          }else{
              new proxy.$tips('用户名或密码错误', 'error').message_();
         }

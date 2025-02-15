@@ -17,16 +17,15 @@ const urls = class{
         const ab_class = `${url}abnormal/list`
 
         //根据企业管理员获得相应公司信息
-        const loadCompany = `${url}companyInfo`
-
+        const loadCompany = `${url}organization/companyInfo`
+        const updateCompany = `${url}organization/updateCompany`
+        const addDepartment = `${url}organization/addDepartment`
+        const departmentList = `${url}organization/departmentList`
 
         return {
-            register,
-            login,
-            user,
-            organization,
-            add_company,
-            ab_class
+            register, login,
+            user, organization, add_company, ab_class,
+            loadCompany,updateCompany,addDepartment,departmentList,
         }
     }
 

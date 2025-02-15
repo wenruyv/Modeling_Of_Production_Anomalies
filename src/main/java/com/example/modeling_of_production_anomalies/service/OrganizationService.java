@@ -4,4 +4,6 @@ import com.example.modeling_of_production_anomalies.entity.Company;
 
 public interface OrganizationService {
     int addCompany(Company company);
+    Company selectByC_username(String c_username);
+    int updateCompany(Company company);
 }

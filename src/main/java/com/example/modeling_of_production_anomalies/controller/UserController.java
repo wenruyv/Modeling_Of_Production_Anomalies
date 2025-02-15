@@ -19,13 +19,10 @@ public class UserController {
 
     @PostMapping("/login")
     public User login(@RequestBody User user){
-        System.out.println(user);
         String username = user.getUsername();
         String password = user.getPassword();
-        System.out.println(username);
-        System.out.println(password);
         User u = userService.findByUsername(username);
-        System.out.println(user);
+        System.out.println(u);
         if (u == null) {
             System.out.println("用户名不存在或错误");
             return null;

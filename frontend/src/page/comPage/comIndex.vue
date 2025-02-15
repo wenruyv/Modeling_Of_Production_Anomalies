@@ -67,12 +67,12 @@ export default {
           {
             id: '2.1',
             title: '部门信息',
-            router: 'organization',
+            router: 'departmentList',
           },
           {
             id: '2.2',
             title: '添加部门',
-            router: 'addCompany',
+            router: 'addDepartment',
           }
         ]//是否有二级菜单
       }

@@ -58,12 +58,22 @@ const routes = [
         path: '/comIndex',
         name: 'comIndex',
         component: () => import('@/page/comPage/comIndex.vue'),
-        redirect: '/companyInfo', // 修改为绝对路径
+        redirect: '/comInfo', // 修改为绝对路径
         children: [
             {
-                path: '/companyInfo', //企业信息
-                name: 'companyInfo',
+                path: '/comInfo', //企业信息
+                name: 'comInfo',
                 component: () => import('@/page/comPage/comInfo.vue')
+            },
+            {
+                path: '/departmentList', //部门列表
+                name: 'departmentList',
+                component: () => import('@/page/comPage/departmentInfo.vue')
+            },
+            {
+                path: '/addDepartment', //添加部门
+                name: 'addDepartment',
+                component: () => import('@/page/comPage/addDepartment.vue')
             }
         ]
     }

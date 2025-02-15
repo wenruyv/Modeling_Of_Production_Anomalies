@@ -16,4 +16,16 @@ public class OrganizationServiceImpl implements OrganizationService {
         int newCompany = companyMapper.addCompany(company);
         return newCompany;
     }
+
+    @Override
+    public Company selectByC_username(String c_username) {
+        Company company = companyMapper.selectByC_username(c_username);
+        return company;
+    }
+
+    @Override
+    public int updateCompany(Company company) {
+        // 根据公司ID或其他唯一标识更新公司信息
+        return companyMapper.updateCompany(company);
+    }
 }

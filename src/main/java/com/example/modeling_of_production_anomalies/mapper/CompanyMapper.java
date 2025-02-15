@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CompanyMapper {
     int addCompany(Company company);
+    Company selectByC_username(String c_username);
+    int updateCompany(Company company);
 }
