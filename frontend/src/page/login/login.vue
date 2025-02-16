@@ -3,23 +3,27 @@
     <div class="denglukuang-content">
       <div class="login-cont">
         <div class="shengchan-title">生产要素异常管理</div>
-        <div class="meituan-user">
-          <p>账号</p>
-          <el-input class="inputflex" v-model="account" placeholder="请输入账号"></el-input>
-        </div>
-        <div class="meituan-user">
-          <p>密码</p>
-          <el-input  class="inputflex" v-model="password" placeholder="请输入密码" show-password></el-input>
-        </div>
-        <!-- 登录和注册的切换 -->
 
-        <!-- 登录和注册按钮提交 -->
-        <el-button  type="primary" class="log-btn" @click="login">登录</el-button>
+        <!-- 使用 form 标签包裹账号和密码输入框 -->
+        <form @submit.prevent="login">
+          <div class="meituan-user">
+            <p>账号</p>
+            <el-input class="inputflex" v-model="account" placeholder="请输入账号"></el-input>
+          </div>
+          <div class="meituan-user">
+            <p>密码</p>
+            <el-input class="inputflex" v-model="password" placeholder="请输入密码" show-password></el-input>
+          </div>
+
+          <!-- 登录提交按钮 -->
+          <el-button type="primary" class="log-btn" native-type="submit">登录</el-button>
+        </form>
 
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import { reactive, toRefs,getCurrentInstance } from 'vue'
