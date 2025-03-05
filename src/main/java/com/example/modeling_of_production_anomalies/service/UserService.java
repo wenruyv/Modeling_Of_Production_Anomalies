@@ -9,5 +9,5 @@ public interface UserService {
     User findByUsername(String username);
     List<User> UserList();
     int addCuser(User user);
-
+    int addDuser(User user);
 }

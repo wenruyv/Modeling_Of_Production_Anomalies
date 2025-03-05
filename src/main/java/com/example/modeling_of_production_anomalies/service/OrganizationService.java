@@ -10,4 +10,5 @@ public interface OrganizationService {
     Company selectByC_username(String c_username);
     int updateCompany(Company company);
     List<Organization> orgList();
+    List<Company> companyList();
 }

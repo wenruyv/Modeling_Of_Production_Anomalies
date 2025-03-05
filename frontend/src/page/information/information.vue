@@ -1,16 +1,13 @@
 <template>
-    <div class="ordering">
-        <div class="heading">生产信息</div>
-
-    </div>
+  <div class="heading">生产信息</div>
 </template>
 
 <script>
 
 export default{
-    setup(){
+  setup(){
 
-    }
+  }
 
 }
 </script>

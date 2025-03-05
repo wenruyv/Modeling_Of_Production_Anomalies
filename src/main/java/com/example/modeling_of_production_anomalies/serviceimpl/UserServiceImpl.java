@@ -35,4 +35,10 @@ public class UserServiceImpl implements UserService {
         int newCuser = userMapper.addCuser(user);
         return newCuser;
     }
+
+    @Override
+    public int addDuser(User user) {
+        int newDuser = userMapper.addDuser(user);
+        return newDuser;
+    }
 }

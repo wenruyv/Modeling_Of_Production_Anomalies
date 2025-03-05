@@ -1,77 +1,69 @@
 <template>
-  <div class="ordering">
-    <div class="heading">分类</div>
+
+    <div class="heading">异常分类</div>
     <div>
-      <!--<el-table :data="ab_class" style="width: 100%;">
-        <el-table-column prop="ab_id" label="id" min-width="20"  />
-        <el-table-column prop="ab_level1" label="一级分类" min-width="50" />
-        <el-table-column prop="ab_level2" label="二级分类" min-width="50"/>
-        <el-table-column prop="ab_def" label="定义" min-width="100" />
-        <el-table-column prop="ab_scene" label="出现场景" min-width="100" />
-        <el-table-column prop="ab_effect" label="影响" min-width="100"/>
-        <el-table-column prop="ab_solve" label="解决方式" min-width="100" />
-        <el-table-column prop="ab_unit" label="负责单位" min-width="100" />
-      </el-table>-->
-      <el-table :data="paginatedData" style="width: 100%;heigh:200px">
-        <el-table-column prop="ab_class" label="异常分类" min-width="50">
-          <template v-slot="scope">
-            <div class="scrollable-cell">{{ scope.row.ab_class}}</div>
-          </template>
-        </el-table-column>
+      <el-card class="box-card"  style="width: 100%" >
+        <el-table :data="paginatedData" stripe style="width: 100%;heigh:200px" >
+          <el-table-column prop="ab_class" label="异常分类" min-width="50">
+            <template v-slot="scope">
+              <div class="scrollable-cell">{{ scope.row.ab_class}}</div>
+            </template>
+          </el-table-column>
 
-        <el-table-column prop="ab_level1" label="一级分类" min-width="50">
-          <template v-slot="scope">
-            <div class="scrollable-cell">{{ scope.row.ab_level1 }}</div>
-          </template>
-        </el-table-column>
+          <el-table-column prop="ab_level1" label="一级分类" min-width="50">
+            <template v-slot="scope">
+              <div class="scrollable-cell">{{ scope.row.ab_level1 }}</div>
+            </template>
+          </el-table-column>
 
-        <el-table-column prop="ab_level2" label="二级分类" min-width="50">
-          <template v-slot="scope">
-            <div class="scrollable-cell">{{ scope.row.ab_level2 }}</div>
-          </template>
-        </el-table-column>
+          <el-table-column prop="ab_level2" label="二级分类" min-width="50">
+            <template v-slot="scope">
+              <div class="scrollable-cell">{{ scope.row.ab_level2 }}</div>
+            </template>
+          </el-table-column>
 
-        <el-table-column prop="ab_def" label="定义" min-width="100">
-          <template v-slot="scope">
-            <div class="scrollable-cell">{{ scope.row.ab_def }}</div>
-          </template>
-        </el-table-column>
+          <el-table-column prop="ab_def" label="定义" min-width="100">
+            <template v-slot="scope">
+              <div class="scrollable-cell">{{ scope.row.ab_def }}</div>
+            </template>
+          </el-table-column>
 
-        <el-table-column prop="ab_scene" label="出现场景" min-width="100">
-          <template v-slot="scope">
-            <div class="scrollable-cell">{{ scope.row.ab_scene }}</div>
-          </template>
-        </el-table-column>
+          <el-table-column prop="ab_scene" label="出现场景" min-width="100">
+            <template v-slot="scope">
+              <div class="scrollable-cell">{{ scope.row.ab_scene }}</div>
+            </template>
+          </el-table-column>
 
-        <el-table-column prop="ab_effect" label="影响" min-width="100">
-          <template v-slot="scope">
-            <div class="scrollable-cell">{{ scope.row.ab_effect }}</div>
-          </template>
-        </el-table-column>
+          <el-table-column prop="ab_effect" label="影响" min-width="100">
+            <template v-slot="scope">
+              <div class="scrollable-cell">{{ scope.row.ab_effect }}</div>
+            </template>
+          </el-table-column>
 
-        <el-table-column prop="ab_solve" label="解决方式" min-width="100">
-          <template v-slot="scope">
-            <div class="scrollable-cell">{{ scope.row.ab_solve }}</div>
-          </template>
-        </el-table-column>
+          <el-table-column prop="ab_solve" label="解决方式" min-width="100">
+            <template v-slot="scope">
+              <div class="scrollable-cell">{{ scope.row.ab_solve }}</div>
+            </template>
+          </el-table-column>
 
-        <el-table-column prop="ab_unit" label="负责单位" min-width="100">
-          <template v-slot="scope">
-            <div class="scrollable-cell">{{ scope.row.ab_unit }}</div>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-          background
-          layout="prev, pager, next"
-          :total="total"
-          :current-page="page"
-          :page-size="pageSize"
-          @current-change="currentchange"
-          :hide-on-single-page="true"
-      />
+          <el-table-column prop="ab_unit" label="负责单位" min-width="100">
+            <template v-slot="scope">
+              <div class="scrollable-cell">{{ scope.row.ab_unit }}</div>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="total"
+            :current-page="page"
+            :page-size="pageSize"
+            @current-change="currentchange"
+            :hide-on-single-page="true"
+        />
+      </el-card>
     </div>
-  </div>
+
 </template>
 
 <script>

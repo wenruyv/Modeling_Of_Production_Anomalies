@@ -21,5 +21,8 @@
     <insert id="addCuser">
         insert into user (username,password,user_type) values (#{username},#{password},#{user_type})
     </insert>
+    <insert id="addDuser">
+        insert into user (username,password,user_type) values (#{username},#{password},#{user_type})
+    </insert>
 
 </mapper>

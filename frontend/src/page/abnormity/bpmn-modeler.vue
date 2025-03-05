@@ -1,5 +1,4 @@
 <template>
-  <div class="ordering">
   <div class="containers">
     <div class="canvas" ref="canvas"></div>
 
@@ -41,7 +40,6 @@
       </li>
     </ul>
   </div>
-    </div >
 </template>
 
 <script>
@@ -225,7 +223,7 @@ export default {
 }
 .buttons {
   position: absolute;
-  left: 20px;
+  left: 170px;
   bottom: 20px;
 }
 .buttons li {

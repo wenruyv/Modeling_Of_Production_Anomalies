@@ -20,8 +20,8 @@ public class OrganizationController {
     @Autowired
     private UserService userService;
     @RequestMapping("/list")
-    public List<Organization> getOrgList(){
-        List<Organization> list = organizationService.orgList();
+    public List<Company> getCompanyList(){
+        List<Company> list = organizationService.companyList();
         System.out.println(list);
         return list;
     }

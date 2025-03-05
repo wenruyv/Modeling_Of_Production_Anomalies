@@ -1,14 +1,14 @@
 <template>
-  <div class="ordering">
     <div class="heading">生产资源结构图</div>
     <el-tree
         :data="data"
         :props="defaultProps"
-
-        style="font-size: 16px;"
-        @node-click="handleNodeClick" /><!--:default-expand-all="true"-->
-
-  </div>
+        @node-click="handleNodeClick"><!--:default-expand-all="true"-->
+      <!-- 自定义节点内容 -->
+      <template #default="{ node }">
+        <span :style="{ color: getNodeColor(node.level) }">{{ node.label }}</span>
+      </template>
+    </el-tree>
 </template>
 
 <script>
@@ -16,7 +16,6 @@ export default {
   setup() {
     // 点击节点事件
     const handleNodeClick = (data) => {
-      console.log(data);
     };
 
     // 树形结构数据
@@ -71,16 +70,25 @@ export default {
       children: 'children',
       label: 'label',
     };
-
+    // 根据节点层级获取颜色
+    const getNodeColor = (level) => {
+      return `hsl(0, 0%, ${15 * level}%)`;
+    };
     return {
       data,
       defaultProps,
       handleNodeClick,
+      getNodeColor
     };
   },
 };
 </script>
 
 <style>
-/* 样式省略 */
+/* 调整 el-tree-node__content 的大小 */
+.el-tree-node__content {
+  height: 30px; /* 增加高度 */
+  padding: 4px;
+  font-size: 20px; /* 增加字体大小 */
+}
 </style>

@@ -1,22 +1,25 @@
 <template>
-  <div class="ordering">
+  <div >
     <div class="heading">账户管理</div>
     <div>
-      <el-table :data="paginatedData" style="width: 100%">
-        <el-table-column prop="user_id" label="id" min-width="100" />
-        <el-table-column prop="username" label="用户名" min-width="100" />
-        <el-table-column prop="password" label="密码" min-width="100"/>
-        <el-table-column prop="user_type" label="用户类型" min-width="100" :formatter="formatUserType"/>
-      </el-table>
-      <el-pagination
-          background
-          layout="prev, pager, next"
-          :total="total"
-          :current-page="page"
-          :page-size="pageSize"
-          @current-change="currentchange"
-          :hide-on-single-page="true"
-      />
+      <el-card class="box-card" style="width: 100%">
+        <el-table :data="paginatedData" stripe style="width: 100%">
+          <el-table-column prop="user_id" label="id" min-width="100" />
+          <el-table-column prop="username" label="用户名" min-width="100" />
+          <el-table-column prop="password" label="密码" min-width="100" />
+          <el-table-column prop="user_type" label="用户类型" min-width="100" :formatter="formatUserType" />
+        </el-table>
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="total"
+            :current-page="page"
+            :page-size="pageSize"
+            @current-change="currentchange"
+            :hide-on-single-page="true"
+        />
+      </el-card>
+
     </div>
 
   </div>
@@ -85,4 +88,5 @@ export default{
 </script>
 
 <style>
+
 </style>

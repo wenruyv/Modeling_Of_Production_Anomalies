@@ -10,7 +10,7 @@ const urls = class{
         //用户列表
         const user = `${url}user/list`
         //生产组织
-        const organization = `${url}organization/list`
+        const company_list = `${url}organization/list`
         //添加公司
         const add_company = `${url}organization/addCompany`
         //异常分类列表
@@ -19,12 +19,12 @@ const urls = class{
         //根据企业管理员获得相应公司信息
         const loadCompany = `${url}organization/companyInfo`
         const updateCompany = `${url}organization/updateCompany`
-        const addDepartment = `${url}organization/addDepartment`
-        const departmentList = `${url}organization/departmentList`
+        const addDepartment = `${url}depart/addDepartment`
+        const departmentList = `${url}depart/list`
 
         return {
             register, login,
-            user, organization, add_company, ab_class,
+            user, company_list, add_company, ab_class,
             loadCompany,updateCompany,addDepartment,departmentList,
         }
     }

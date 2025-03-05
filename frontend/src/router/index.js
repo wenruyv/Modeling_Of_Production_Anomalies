@@ -18,9 +18,9 @@ const routes = [
                 component: () => import('@/page/user/user.vue')
             },
             {
-                path: '/organization', //
-                name: 'organization',
-                component: () => import('@/page/organization/organization.vue')
+                path: '/companyList', //
+                name: 'companyList',
+                component: () => import('@/page/organization/companyList.vue')
             },
             {
                 path: '/org', //树状图？？？
@@ -75,11 +75,7 @@ const routes = [
                 name: 'departmentList',
                 component: () => import('@/page/comPage/departmentInfo.vue')
             },
-            {
-                path: '/addDepartment', //添加部门
-                name: 'addDepartment',
-                component: () => import('@/page/comPage/addDepartment.vue')
-            }
+
         ]
     }
 ];

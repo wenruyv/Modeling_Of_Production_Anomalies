@@ -14,6 +14,7 @@ public interface UserMapper {
     //列表展示
     List<User> UserList();
     int addCuser(User user);
+    int addDuser(User user);
 
 
 }

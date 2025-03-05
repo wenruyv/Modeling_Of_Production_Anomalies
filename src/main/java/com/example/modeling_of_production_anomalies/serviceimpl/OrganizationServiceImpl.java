@@ -40,4 +40,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         return companyMapper.updateCompany(company);
     }
 
+    @Override
+    public List<Company> companyList() {
+        return companyMapper.companyList();
+    }
 }

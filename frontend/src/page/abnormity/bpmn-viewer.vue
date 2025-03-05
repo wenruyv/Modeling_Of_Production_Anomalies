@@ -1,5 +1,4 @@
 <template>
-  <div class="ordering">
   <div class="containers">
     <!-- 返回主页按钮 -->
     <el-button type="primary" round class="back-home-button" @click="goBackHome">
@@ -13,7 +12,7 @@
         @mousedown="handleMouseDown"
     ></div>
   </div>
-  </div>
+
 </template>
 
 <script setup>
