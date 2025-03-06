@@ -44,11 +44,11 @@
             <el-col :span="12">
               <el-form-item label="公司类型" prop="type">
                 <el-select v-model="company.type" placeholder="请选择">
-                  <el-option label="研发公司" value="研发公司" />
-                  <el-option label="生产公司" value="生产公司" />
-                  <el-option label="供应公司" value="供应公司" />
-                  <el-option label="销售公司" value="销售公司" />
-                  <el-option label="服务公司" value="服务公司" />
+                  <el-option label="研发相关" value="研发相关" />
+                  <el-option label="生产相关" value="生产相关" />
+                  <el-option label="供应相关" value="供应相关" />
+                  <el-option label="销售相关" value="销售相关" />
+                  <el-option label="服务相关" value="服务相关" />
                 </el-select>
               </el-form-item>
             </el-col>

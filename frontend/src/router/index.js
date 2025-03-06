@@ -63,17 +63,32 @@ const routes = [
         path: '/comIndex',
         name: 'comIndex',
         component: () => import('@/page/comPage/comIndex.vue'),
-        redirect: '/comInfo', // 修改为绝对路径
+        redirect: '/companyIndex', // 修改为绝对路径
         children: [
+            {
+                path: '/companyIndex', //首页
+                name: 'companyIndex',
+                component: () => import('@/page/comPage/index1.vue')
+            },
             {
                 path: '/comInfo', //企业信息
                 name: 'comInfo',
                 component: () => import('@/page/comPage/comInfo.vue')
             },
             {
+                path: '/comOrg', //企业组织结构图
+                name: 'comOrg',
+                component: () => import('@/page/comPage/comOrganization.vue')
+            },
+            {
                 path: '/departmentList', //部门列表
                 name: 'departmentList',
                 component: () => import('@/page/comPage/departmentInfo.vue')
+            },
+            {
+                path: '/peopleList', //员工列表
+                name: 'peopleList',
+                component: () => import('@/page/comPage/comPeople.vue')
             },
 
         ]

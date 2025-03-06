@@ -33,7 +33,7 @@ public class DepartmentController {
         duser.setUsername(department.getD_username());
         duser.setPassword(department.getD_password());
         duser.setUser_type(3);
-        // 添加Cuser到数据库
+        // 添加Duser到数据库
         int newDuser = userService.addDuser(duser);
 
         // 输出调试信息

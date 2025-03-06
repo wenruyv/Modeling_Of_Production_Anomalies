@@ -19,6 +19,39 @@ public class OrganizationController {
     private OrganizationService organizationService;
     @Autowired
     private UserService userService;
+    // 获取树形结构数据
+    @GetMapping("/tree")
+    public List<Organization> getTree() {
+        return organizationService.getOrgTree();
+    }
+    @PostMapping("/updateTree")
+    public int updateOrgTree(@RequestBody Organization node){
+        int result = organizationService.updateOrgTree(node);
+        if (result == 1) {
+            return result;
+        } else {
+            return 0;
+        }
+    }
+    @PostMapping("/addTree")
+    public int addNodeTree(@RequestBody Organization node){
+        int result = organizationService.addTree(node);
+        if (result == 1) {
+            return result;
+        } else {
+            return 0;
+        }
+    }
+    @PostMapping("/deleteTree")
+    public int deleteNodeTree(@RequestBody Organization id){
+        int result = organizationService.deleteNode(id);
+        if (result == 1) {
+            return result;
+        } else {
+            return 0;
+        }
+    }
+
     @RequestMapping("/list")
     public List<Company> getCompanyList(){
         List<Company> list = organizationService.companyList();

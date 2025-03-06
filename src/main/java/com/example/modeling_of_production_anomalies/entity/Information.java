@@ -3,12 +3,11 @@ package com.example.modeling_of_production_anomalies.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Organization {
+public class Information {
     private String id;
     private String label;
     private String pid;
-    private List<Organization> children = new ArrayList<>(); // 子节点列表
-
+    private List<Information> children = new ArrayList<>(); // 子节点列表
     public String getId() {
         return id;
     }
@@ -33,20 +32,20 @@ public class Organization {
         this.pid = pid;
     }
 
-    public List<Organization> getChildren() {
+    public List<Information> getChildren() {
         return children;
     }
 
-    public void setChildren(List<Organization> children) {
+    public void setChildren(List<Information> children) {
         this.children = children;
     }
 
     @Override
     public String toString() {
-        return "Organization{" +
-                "id=" + id +
-                ", name='" + label + '\'' +
-                ", parent_id='" + pid + '\'' +
+        return "Information{" +
+                "id='" + id + '\'' +
+                ", label='" + label + '\'' +
+                ", pid='" + pid + '\'' +
                 '}';
     }
 }

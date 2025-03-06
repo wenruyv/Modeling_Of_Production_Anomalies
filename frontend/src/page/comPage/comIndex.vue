@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { OfficeBuilding, Menu } from '@element-plus/icons-vue';
+import { OfficeBuilding, Menu,User } from '@element-plus/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ref, watch, onMounted } from 'vue';
 
@@ -80,22 +80,44 @@ export default {
     const menu = [
       {
         id: '1',
+        icon: Menu,
+        title: '首页',
+        router: 'companyIndex',
+        Subclass: [], // 是否有二级菜单
+      },
+      {
+        id: '2',
         icon: OfficeBuilding,
         title: '企业信息',
         router: 'comInfo',
         Subclass: [], // 是否有二级菜单
       },
       {
-        id: '2',
+        id: '3',
+        icon: OfficeBuilding,
+        title: '组织结构',
+        router: 'comOrg',
+        Subclass: [], // 是否有二级菜单
+      },
+      {
+        id: '4',
         icon: OfficeBuilding,
         title: '部门管理',
         router: 'departmentList',
         Subclass: [], // 是否有二级菜单
       },
+      {
+        id: '5',
+        icon: User,
+        title: '人员管理',
+        router: 'peopleList',
+        Subclass: [], // 是否有二级菜单
+      },
+
     ];
 
     // 初始化面包屑
-    const breadcrumbItems = ref(['企业信息']);
+    const breadcrumbItems = ref(['首页']);
 
     // 从 localStorage 中读取面包屑
     const loadBreadcrumb = () => {

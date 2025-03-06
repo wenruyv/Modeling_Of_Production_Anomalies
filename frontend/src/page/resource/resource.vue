@@ -1,94 +1,122 @@
 <template>
-    <div class="heading">生产资源结构图</div>
-    <el-tree
-        :data="data"
-        :props="defaultProps"
-        @node-click="handleNodeClick"><!--:default-expand-all="true"-->
-      <!-- 自定义节点内容 -->
-      <template #default="{ node }">
-        <span :style="{ color: getNodeColor(node.level) }">{{ node.label }}</span>
-      </template>
-    </el-tree>
+  <div class="heading">生产资源结构图</div>
+  <div style="height: 520px; width: 100%;">
+    <vue3-tree-org
+        :data="resource"
+        center
+        default-expand-level="1"
+        :horizontal="false"
+        :collapsable="true"
+        :only-one-node="false"
+        label-style="background: #fff; color: #5e6d82"
+        :clone-node-drag="cloneNodeDrag"
+        :before-drag-end="beforeDragEnd"
+        @on-node-drag="nodeDragMove"
+        @on-node-drag-end="nodeDragEnd"
+        @on-contextmenu="onMenus"
+        @on-expand="onExpand"
+        @on-node-dblclick="onNodeDblclick"
+    />
+  </div>
 </template>
 
 <script>
+import { ElSwitch, ElColorPicker } from 'element-plus'
+import {getCurrentInstance, onMounted, ref} from 'vue'
+
 export default {
+  name: "baseTree",
+  components: {
+    ElSwitch,
+    ElColorPicker,
+
+  },
   setup() {
-    // 点击节点事件
-    const handleNodeClick = (data) => {
-    };
+    const { proxy } = getCurrentInstance();
+    const resource = ref([]); // 初始值为空数组
 
-    // 树形结构数据
-    const data = [
-      {
-        label: '生产设备',
-        children: [
-          {label: '名称'},
-          {
-            label: '设备类型',
-            children: [{label: '自动化设备'},{label: '半自动化设备'}, {label: '手动设备'}]
-          },
-          {
-            label: '设备规格',
-            children: [{label: '尺寸（长宽高）'},{label: '重量'},{label: '功率要求'}]
-          },
-          {
-            label: '成本',
-            children: [
-              {label: '购买成本'},
-              {
-                label: '维护成本-设备折旧',
-                children: [{label: '直线法'}, {label: '双倍余额递减法'}, {label: '年数总和法'}, {label: '单位产出法'}]
-              }
-            ]
-          },
-          {
-            label: '功能',
-            children: [{label: '功能'},{label: '生产速度'},{label: '工作效率'}]
-          },
-          {
-            label: '维护与保养',
-            children: [{label: '维护周期'},{label: '维修难度'},{label: '保修期'},{label: '使用年限'}]
-          },
-          {
-            label: '安全性',
-            children: [{label: '安全等级'}]
-          },
-          {label: '供应来源'},
-          {label: '所属组织（生产组织-供应公司）'},
-        ],
-      },
-      {
-        label: '原材料',
-        children: [{label: '名称'},{label: '尺寸'},{label: '功能'},{label: '单位成本'},
-                    {label: '供应来源'},{label: '库存量'},],
-      },
-    ];
+    const cloneNodeDrag = ref(true);
+    // 请求数据
+    onMounted(() => {
+      resTree();
+    });
 
-    // 树形结构配置
-    const defaultProps = {
-      children: 'children',
-      label: 'label',
-    };
-    // 根据节点层级获取颜色
-    const getNodeColor = (level) => {
-      return `hsl(0, 0%, ${15 * level}%)`;
-    };
+    async function resTree() {
+      try {
+        const res = await new proxy.$request(proxy.$urls.m().resourceTree).modeget();
+        console.log(res)
+        if (res && res.data && Array.isArray(res.data)) {
+          // 直接赋值
+          resource.value = res.data[0];
+          console.log('后端传来的数据');
+        } else {
+          new proxy.$tips('数据格式不正确', 'error').message_();
+        }
+      } catch (error) {
+        console.log(error);
+        new proxy.$tips('服务器发生错误', 'error').message_();
+      }
+    }
     return {
-      data,
-      defaultProps,
-      handleNodeClick,
-      getNodeColor
+      cloneNodeDrag,
+      resource,
+      resTree,
     };
+  },
+  created() {
+    // this.toggleExpand(this.data, this.expandAll);
+  },
+  methods: {
+    onMenus({ node, command }) {
+      console.log(node, command);
+    },
+    onExpand(e, data) {
+      console.log(e, data);
+    },
+    onExpandAll(b) {
+      console.log(b)
+    },
+    nodeDragMove(data) {
+      console.log(data);
+    },
+    beforeDragEnd(node, targetNode) {
+      return new Promise((resolve, reject) => {
+        if (!targetNode) reject()
+        if (node.id === targetNode.id) {
+          reject()
+        } else {
+          resolve()
+        }
+      })
+    },
+    nodeDragEnd(data, isSelf) {
+      console.log(data, isSelf);
+    },
+    onNodeDblclick() {
+      console.log('onNodeDblclick')
+    },
+
+    expandChange() {
+      // this.toggleExpand(this.data, this.expandAll);
+    },
+    toggleExpand(data, val) {
+      if (Array.isArray(data)) {
+        data.forEach((item) => {
+          item.expand = val
+          if (item.children) {
+            this.toggleExpand(item.children, val);
+          }
+        });
+      } else {
+        data.expand = val
+        if (data.children) {
+          this.toggleExpand(data.children, val);
+        }
+      }
+    },
   },
 };
 </script>
 
 <style>
-/* 调整 el-tree-node__content 的大小 */
-.el-tree-node__content {
-  height: 30px; /* 增加高度 */
-  padding: 4px;
-  font-size: 20px; /* 增加字体大小 */
-}
 </style>

@@ -9,6 +9,9 @@ public interface OrganizationService {
     int addCompany(Company company);
     Company selectByC_username(String c_username);
     int updateCompany(Company company);
-    List<Organization> orgList();
+    List<Organization> getOrgTree();
     List<Company> companyList();
+    int updateOrgTree(Organization organization);
+    int addTree(Organization organization);
+    int deleteNode(Organization id);
 }
