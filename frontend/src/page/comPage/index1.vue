@@ -1,11 +1,12 @@
 <template>
-  <div class="heading">首页
 
+    <div class="heading">首页</div>
+    <div >欢迎访问 {{ company.name }} 公司首页。</div>
+  <div class="tips">
+    <div >公司简介：{{company.introduction}}</div>
+    <div>联系电话：{{company.phone}}</div>
+    <div>联系邮箱：{{company.email}}</div>
   </div>
-  <div class>
-欢迎访问{{ company.name }}首页。
-  </div>
-  <div>公司简介：{{company.introduction}}</div>
 
 </template>
 
@@ -64,4 +65,8 @@ export default{
 </script>
 
 <style>
+.tips{
+  margin-left: 20px;
+  margin-top: 400px;
+}
 </style>

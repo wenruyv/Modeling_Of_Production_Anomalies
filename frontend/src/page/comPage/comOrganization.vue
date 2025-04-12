@@ -1,5 +1,6 @@
 <template>
   <div className="heading">组织结构</div>
+  <div>{{organization}}</div>
   <div>
     <el-tabs
         v-model="activeTabName"
@@ -43,7 +44,8 @@ export default {
     const { proxy } = getCurrentInstance();
     const organization = ref([]);
     const activeTabName = ref('');
-    let tabCounter = 0;
+    // 从localStorage初始化tabCounter，如果没有则设为0
+    let tabCounter = ref(parseInt(localStorage.getItem('tabCounter')) || 0);
 
     async function organizationTree() {
       try {
@@ -54,18 +56,36 @@ export default {
           console.log("res1是空的");
           const res = await new proxy.$request(proxy.$urls.m().orgTree).modeget();
           if (res?.data && Array.isArray(res.data)) {
-            organization.value = res.data.map((item, index) => ({
+            // 计算现有标签中的最大编号
+            const maxTabNumber = res.data.reduce((max, item) => {
+              const num = parseInt(item.name);
+              return isNaN(num) ? max : Math.max(max, num);
+            }, 0);
+
+            // 更新tabCounter为最大编号
+            tabCounter.value = maxTabNumber;
+            localStorage.setItem('tabCounter', maxTabNumber.toString());
+
+            organization.value = res.data.map(item => ({
               ...item,
-              name: `${index + 1}` // 确保每个标签页有唯一的 name
+              name: item.name || `${++tabCounter.value}`, // 保留原有名称或生成新编号
+              expand: true
             }));
-            activeTabName.value = organization.value[0].name || '';
-            tabCounter = organization.value.length;
-          } else {
-            new proxy.$tips('数据格式不正确', 'error').message_();
+
+            activeTabName.value = organization.value[0]?.name || '';
           }
         }else{
+          // 对于已有数据，同样计算最大编号
+          const maxTabNumber = res1.data.reduce((max, item) => {
+            const num = parseInt(item.name);
+            return isNaN(num) ? max : Math.max(max, num);
+          }, 0);
+
+          tabCounter.value = maxTabNumber;
+          localStorage.setItem('tabCounter', maxTabNumber.toString());
+
           organization.value = res1.data;
-          activeTabName.value = organization.value[0].name || '';
+          activeTabName.value = organization.value[0]?.name || '';
 
         }
 
@@ -78,11 +98,15 @@ export default {
     // 处理标签页的添加/删除
     const handleTabsEdit = (targetName, action) => {
       if (action === 'add') {
-        const newTabName = `${++tabCounter}`;
+        // 增加标签时更新计数器并存储
+        tabCounter.value += 1;  // 使用.value访问ref的值
+        localStorage.setItem('tabCounter', tabCounter.value.toString());
+        const newTabName = `${tabCounter.value}`;
         organization.value.push({
           name: newTabName,
           label: `New Tab ${newTabName}`,
-          // 其他默认数据...
+          expand: true
+
         });
         activeTabName.value = newTabName;
       } else if (action === 'remove') {
@@ -142,8 +166,9 @@ export default {
     };
   },
   methods: {
-    onMenus({ node, command }) {
+    onMenus({node, command}) {
       console.log(node, command);
+
     },
     onExpand(e, data) {
       console.log(e, data);
@@ -151,7 +176,7 @@ export default {
     onNodeDblclick() {
       console.log('onNodeDblclick');
     },
-  },
+  }
 };
 </script>
 

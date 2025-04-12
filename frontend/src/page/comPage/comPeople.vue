@@ -1,6 +1,6 @@
 <template>
   <div >
-    <div class="heading">账户管理</div>
+    <div class="heading">员工信息</div>
     <div>
       <el-card class="box-card" style="width: 100%">
         <el-table :data="paginatedData" stripe style="width: 100%">

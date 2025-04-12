@@ -19,7 +19,14 @@
       <el-dialog v-model="dialogFormVisible" title="添加部门信息">
         <el-form :model="depart" :rules="rules" ref="companyForm" label-width="120px">
           <el-form-item label="部门" prop="department">
-            <el-input v-model="depart.department" size="large"/>
+            <el-tree-select
+                v-model="depart.department"
+                :data="organization"
+                :props="treeProps"
+                :render-after-expand="false"
+                placeholder="请选择部门"
+                size="large"
+            />
           </el-form-item>
           <el-form-item label="管理员账号" prop="d_username">
             <el-input v-model="depart.d_username" size="large"/>
@@ -30,7 +37,7 @@
         </el-form>
         <template #footer>
           <span class="dialog-footer">
-            <el-button @click="dialogFormVisible = false" >取消</el-button>
+            <el-button @click="handleDialogClose" >取消</el-button>
             <el-button type="primary" @click="insertCom" >
               添加
             </el-button>
@@ -58,17 +65,56 @@ export default{
     const {proxy} = getCurrentInstance()
     //请求数据
     onMounted(()=>{
-      depList()
+      orgTree();
+      depList();
+
     })
     const dialogFormVisible = ref(false)
     const formLabelWidth = '140px'
+    const value = ref()
+    const organization = ref([]);
     const depart = reactive({
       department: '',
       d_username: '',
       d_password: '',
     })
+    const treeProps = {
+      value: 'id',      // 使用您数据中的 'id' 字段作为值
+      label: 'label',   // 使用 'label' 字段作为显示文本
+      children: 'children' // 子节点字段名
+    };
+    const resetForm = () => {
+      depart.department = '';
+      depart.d_username = '';
+      depart.d_password = '';
+    };
+
+// 在弹窗关闭时调用
+    const handleDialogClose = () => {
+      dialogFormVisible.value = false;
+      proxy.$refs.companyForm?.resetFields();  // 重置表单及验证状态
+      resetForm();
+    };
+    //organization树形选择器数据
+    async function orgTree() {
+      try {
+        const c_username = localStorage.getItem('c_username');
+        const res = await new proxy.$request(proxy.$urls.m().isEmptyOrg  + '?c_username=' + c_username).modeget();
+        console.log(res)
+        if (res && res.data && Array.isArray(res.data)) {
+          organization.value = res.data;
+          console.log("organization");
+          console.log(organization);
+        } else {
+          new proxy.$tips('公司组织结构还未保存', 'error').message_();
+        }
+      } catch (error) {
+        console.log(error);
+        new proxy.$tips('服务器发生错误', 'error').message_();
+      }
+    }
     const rules = {
-      department: [{ required: true, message: '部门不能为空', trigger: 'blur' }],
+      department: [{ required: true, message: '请选择部门', trigger: 'change' }],
       d_username: [{ required: true, message: '部门管理员账号不能为空', trigger: 'blur' }],
       d_password: [{ required: true, message: '部门管理员密码不能为空', trigger: 'blur' }],
     }
@@ -102,6 +148,8 @@ export default{
         new proxy.$tips('服务器发生错误','error').message_()
       }
     }
+
+    //添加新数据
     const insertCom = async () => {
       try {
         const valid = await proxy.$refs.companyForm.validate();
@@ -113,7 +161,7 @@ export default{
         console.log(res);
         if (res.data == 1) {
           new proxy.$tips('添加成功', 'success').message_();
-          dialogFormVisible.value = false; // 关闭弹窗
+          handleDialogClose(); // 关闭弹窗
           await depList(); // 刷新页面内容
         } else {
           new proxy.$tips('添加失败', 'error').message_();
@@ -127,7 +175,20 @@ export default{
     function currentchange(e) {
       depart_data.page = e; // 更新页码
     }
-    return {...toRefs(depart_data),paginatedData,currentchange,dialogFormVisible,formLabelWidth,depart,rules,insertCom}
+    return {...toRefs(depart_data),
+      paginatedData,
+      currentchange,
+      dialogFormVisible,
+      formLabelWidth,
+      depart,
+      rules,
+      insertCom,
+      value,
+      organization,
+      orgTree,
+      treeProps,
+      handleDialogClose
+    }
   }
 
 }
