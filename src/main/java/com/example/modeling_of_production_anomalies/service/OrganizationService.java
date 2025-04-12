@@ -14,4 +14,6 @@ public interface OrganizationService {
     int updateOrgTree(Organization organization);
     int addTree(Organization organization);
     int deleteNode(Organization id);
+    int updateC_org(String c_username,String c_org);
+    String isEmptyOrg(String c_username);
 }

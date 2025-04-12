@@ -18,19 +18,22 @@ const urls = class{
         const resourceTree = `${url}resource/tree`
         //生产信息
         const informationTree = `${url}information/tree`
+        const saveTree = `${url}information/saveTree`
         //异常分类列表
         const ab_class = `${url}abnormal/list`
         //根据企业管理员获得相应公司信息
         const companyIndex = `${url}organization/index1`
         const loadCompany = `${url}organization/companyInfo`
         const updateCompany = `${url}organization/updateCompany`
+        const updateC_org = `${url}organization/updateC_org`
+        const isEmptyOrg = `${url}organization/isEmptyOrg`
         const addDepartment = `${url}depart/addDepartment`
         const departmentList = `${url}depart/list`
 
         return {
              login,
-            user, company_list, add_company, ab_class,orgTree,resourceTree,informationTree,updateTree,addTree,deleteTree,
-            companyIndex,loadCompany,updateCompany,addDepartment,departmentList,
+            user, company_list, add_company, ab_class,orgTree,resourceTree,informationTree,saveTree,updateTree,addTree,deleteTree,
+            companyIndex,loadCompany,updateCompany,updateC_org,isEmptyOrg,addDepartment,departmentList,
         }
     }
 

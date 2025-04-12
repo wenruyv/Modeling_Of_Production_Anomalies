@@ -90,4 +90,19 @@ public class OrganizationController {
             return 0;
         }
     }
+    @PostMapping("/updateC_org")
+    public int updateC_org(@RequestParam String c_username, @RequestParam String c_org) {
+        int result = organizationService.updateC_org(c_username,c_org);
+        if (result == 1) {
+            return result;
+        } else {
+            return 0;
+        }
+    }
+    @GetMapping("/isEmptyOrg")
+    public String isEmptyOrg(@RequestParam String c_username) {
+        String result = organizationService.isEmptyOrg(c_username);
+        return result;
+
+    }
 }

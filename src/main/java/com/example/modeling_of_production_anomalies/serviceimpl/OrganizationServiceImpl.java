@@ -18,7 +18,14 @@ public class OrganizationServiceImpl implements OrganizationService {
     private CompanyMapper companyMapper;
     @Autowired
     private OrganizationMapper organizationMapper;
-
+    @Override
+    public String isEmptyOrg(String c_username){
+        return companyMapper.isEmptyOrg(c_username);
+    }
+    @Override
+    public int updateC_org(String c_username,String c_org){
+        return companyMapper.updateC_org(c_username,c_org);
+    }
     @Override
     public List<Organization> getOrgTree() {
         List<Organization> allNodes = organizationMapper.orgList(); // 获取所有节点

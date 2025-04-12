@@ -13,6 +13,7 @@ public class Company {
     private String c_username;
     private String c_password;
     private String introduction;
+    private String c_org;
 
     public int getId() {
         return id;
@@ -108,6 +109,14 @@ public class Company {
 
     public void setIntroduction(String introduction) {
         this.introduction = introduction;
+    }
+
+    public String getC_org() {
+        return c_org;
+    }
+
+    public void setC_org(String c_org) {
+        this.c_org = c_org;
     }
 
     @Override

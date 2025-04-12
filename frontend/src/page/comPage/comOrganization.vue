@@ -1,149 +1,162 @@
 <template>
-  <div class="heading">企业组织结构图</div>
+  <div className="heading">组织结构</div>
   <div>
-    <!--    <div>{{org}}</div>-->
-    <!--<div>{{tabs}}</div>-->
-    <el-tabs type="border-card">
+    <el-tabs
+        v-model="activeTabName"
+        editable
+        @edit="handleTabsEdit"
+        type="border-card"
+    >
       <el-tab-pane
-          v-for="(tab, index) in tabs"
-          :key="index"
-          :label="tab.label"
-          style="height: 450px; width: 100%;"
+          v-for="tab in organization"
+          :key="tab.name"
+          :label="tab.label || `Tab ${tab.name}`"
+          :name="tab.name"
+          style="height: 410px; width: 100%;"
       >
         <vue3-tree-org
-            :data="tab.data"
+            :data="tab"
             center
             default-expand-level="10"
             :horizontal="false"
             :collapsable="true"
-            :only-one-node="false"
             label-style="background: #fff; color: #5e6d82"
-            :clone-node-drag="cloneNodeDrag"
-            :before-drag-end="beforeDragEnd"
-            @on-node-drag="nodeDragMove"
-            @on-node-drag-end="nodeDragEnd"
+            :node-draggable="false"
             @on-contextmenu="onMenus"
             @on-expand="onExpand"
             @on-node-dblclick="onNodeDblclick"
-        />
+        >
+        </vue3-tree-org>
+        <el-button type="primary" :icon="Edit" style="float: right;margin-right: 10px;padding: 8px" @click="updateOrg"/>
       </el-tab-pane>
     </el-tabs>
   </div>
 </template>
+
 <script>
-import { ElSwitch, ElColorPicker } from 'element-plus'
-import {getCurrentInstance, onMounted, ref} from 'vue'
-
+import { getCurrentInstance, onMounted, ref } from 'vue';
+import { Edit } from '@element-plus/icons-vue';
 export default {
-  name: "baseTree",
-  components: {
-    ElSwitch,
-    ElColorPicker,
 
-  },
+  name: "BaseTree",
   setup() {
     const { proxy } = getCurrentInstance();
-    const orgYan = ref([]); // 初始值为空数组
-    const orgChan = ref([]);
-    const orgGong = ref([]);
-    const orgXiao = ref([]);
-    const orgFu = ref([]);
-    const cloneNodeDrag = ref(true);
+    const organization = ref([]);
+    const activeTabName = ref('');
+    let tabCounter = 0;
 
-    const tabs = ref([
-      { label: '研发', data: orgYan },
-      { label: '生产', data: orgChan },
-      { label: '供应', data: orgGong },
-      { label: '销售', data: orgXiao },
-      { label: '服务', data: orgFu },
-    ]);
-    // 请求数据
-    onMounted(() => {
-      orgTree();
-    });
-    const data= { "id": 1, "label": "研发", "parent_id": null, "children": [ { "id": 2, "label": "项目管理部", "parent_id": 1, "children": [ { "id": 3, "label": "项目经理", "parent_id": 2, "children": null }, { "id": 4, "label": "项目助理", "parent_id": 2, "children": null }, { "id": 5, "label": "风险控制组", "parent_id": 2, "children": null } ] }, { "id": 6, "label": "市场部门", "parent_id": 1, "children": [ { "id": 7, "label": "市场分析师", "parent_id": 6, "children": null } ] }, { "id": 8, "label": "研发部门", "parent_id": 1, "children": [ { "id": 9, "label": "产品设计组", "parent_id": 8, "children": [ { "id": 10, "label": "设计工程师", "parent_id": 9, "children": null }, { "id": 11, "label": "交互设计师", "parent_id": 9, "children": null } ] }, { "id": 12, "label": "技术研发组", "parent_id": 8, "children": [ { "id": 13, "label": "软件工程师", "parent_id": 12, "children": null }, { "id": 14, "label": "硬件工程师", "parent_id": 12, "children": null }, { "id": 15, "label": "嵌入式工程师", "parent_id": 12, "children": null } ] }, { "id": 16, "label": "测试与验证组", "parent_id": 8, "children": [ { "id": 17, "label": "测试工程师", "parent_id": 16, "children": null } ] } ] } ] }
-    async function orgTree() {
+    async function organizationTree() {
       try {
-        const res = await new proxy.$request(proxy.$urls.m().orgTree).modeget();
-        console.log(res)
-        if (res && res.data && Array.isArray(res.data)) {
-          // 直接赋值
-          orgYan.value = res.data[0];
-          orgChan.value = res.data[1];
-          orgGong.value = res.data[2];
-          orgXiao.value = res.data[3];
-          orgFu.value = res.data[4];
-          console.log('后端传来的数据');
-        } else {
-          new proxy.$tips('数据格式不正确', 'error').message_();
+        const c_username = localStorage.getItem('c_username');
+        const res1 = await new proxy.$request(proxy.$urls.m().isEmptyOrg  + '?c_username=' + c_username).modeget();
+        console.log(res1);
+        if(res1.data == "" || res1.data == null){
+          console.log("res1是空的");
+          const res = await new proxy.$request(proxy.$urls.m().orgTree).modeget();
+          if (res?.data && Array.isArray(res.data)) {
+            organization.value = res.data.map((item, index) => ({
+              ...item,
+              name: `${index + 1}` // 确保每个标签页有唯一的 name
+            }));
+            activeTabName.value = organization.value[0].name || '';
+            tabCounter = organization.value.length;
+          } else {
+            new proxy.$tips('数据格式不正确', 'error').message_();
+          }
+        }else{
+          organization.value = res1.data;
+          activeTabName.value = organization.value[0].name || '';
+
         }
+
       } catch (error) {
-        console.log(error);
+        console.error(error);
         new proxy.$tips('服务器发生错误', 'error').message_();
       }
     }
+
+    // 处理标签页的添加/删除
+    const handleTabsEdit = (targetName, action) => {
+      if (action === 'add') {
+        const newTabName = `${++tabCounter}`;
+        organization.value.push({
+          name: newTabName,
+          label: `New Tab ${newTabName}`,
+          // 其他默认数据...
+        });
+        activeTabName.value = newTabName;
+      } else if (action === 'remove') {
+        if (organization.value.length <= 1) {
+          new proxy.$tips('至少保留一个标签页', 'warning').message_();
+          return;
+        }
+
+        const tabs = organization.value;
+        let newActiveName = activeTabName.value;
+
+        if (newActiveName === targetName) {
+          const targetIndex = tabs.findIndex(tab => tab.name === targetName);
+          const nextTab = tabs[targetIndex + 1] || tabs[targetIndex - 1];
+          if (nextTab) {
+            newActiveName = nextTab.name;
+          }
+        }
+
+        organization.value = tabs.filter(tab => tab.name !== targetName);
+        activeTabName.value = newActiveName;
+      }
+    };
+    //修改组织结构
+    const updateOrg = async () => {
+      try {
+        // 发送修改请求
+        const c_username = localStorage.getItem('c_username');
+        // 方法2：作为表单数据发送（推荐）
+        const formData = new FormData();
+        formData.append('c_username', c_username);
+        formData.append('c_org', JSON.stringify(organization.value));
+        const res = await new proxy.$request(proxy.$urls.m().updateC_org, formData).modepost();
+        console.log(res);
+        if (res.data == 1) {
+          new proxy.$tips('修改成功', 'success').message_();
+          await organizationTree();
+
+        } else {
+          new proxy.$tips('修改失败', 'error').message_();
+        }
+      } catch (error) {
+        console.error(error);
+        new proxy.$tips('服务器发生错误', 'error').message_();
+      }
+    };
+    // 初始化或获取数据
+    onMounted(() => {
+      organizationTree();
+    });
     return {
-      cloneNodeDrag,
-      orgYan,orgChan,orgGong,orgXiao,orgFu,
-      orgTree,data,tabs
+      organization,
+      activeTabName,
+      handleTabsEdit,
+      Edit,
+      updateOrg
     };
   },
-  created() {
-    // this.toggleExpand(this.data, this.expandAll);
-  },
   methods: {
-    onMenus({ node, command }) {//右键菜单事件
+    onMenus({ node, command }) {
       console.log(node, command);
     },
     onExpand(e, data) {
       console.log(e, data);
     },
-    onExpandAll(b) {
-      console.log(b)
-    },
-    //节点拖拽事件，先不做
-    nodeDragMove(data) {
-      console.log(data);
-    },
-    beforeDragEnd(node, targetNode) {
-      return new Promise((resolve, reject) => {
-        if (!targetNode) reject()
-        if (node.id === targetNode.id) {
-          reject()
-        } else {
-          resolve()
-        }
-      })
-    },
-    nodeDragEnd(data, isSelf) {
-      console.log(data, isSelf);
-    },
-    //节点双击事件
     onNodeDblclick() {
-      console.log('onNodeDblclick')
-    },
-
-    expandChange() {
-      // this.toggleExpand(this.data, this.expandAll);
-    },
-    toggleExpand(data, val) {
-      if (Array.isArray(data)) {
-        data.forEach((item) => {
-          item.expand = val
-          if (item.children) {
-            this.toggleExpand(item.children, val);
-          }
-        });
-      } else {
-        data.expand = val
-        if (data.children) {
-          this.toggleExpand(data.children, val);
-        }
-      }
+      console.log('onNodeDblclick');
     },
   },
 };
 </script>
-<style>
 
+<style>
+.el-tabs__new-tab {
+  margin-right: 10px;
+}
 </style>

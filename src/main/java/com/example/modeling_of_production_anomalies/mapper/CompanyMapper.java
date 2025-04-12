@@ -12,5 +12,7 @@ public interface CompanyMapper {
     int addCompany(Company company);
     Company selectByC_username(String c_username);
     int updateCompany(Company company);
+    String isEmptyOrg(String c_username);
     List<Company> companyList();
+    int updateC_org(String c_username,String c_org);
 }

@@ -16,10 +16,13 @@
         <result column="c_username" jdbcType="LONGVARCHAR" property="c_username"/>
         <result column="c_password" jdbcType="LONGVARCHAR" property="c_password"/>
         <result column="introduction" jdbcType="LONGVARCHAR" property="introduction"/>
-
+        <result column="c_org" jdbcType="LONGVARCHAR" property="c_org"/>
     </resultMap>
     <select id="companyList" resultMap="BaseResultMap">
         select * from company
+    </select>
+    <select id="isEmptyOrg" resultType="string">
+        select c_org from company where c_username = #{c_username}
     </select>
 
     <insert id="addCompany">
@@ -41,8 +44,11 @@
             web = #{web},
             introduction = #{introduction},
             c_username = #{c_username},
-            c_password = #{c_password}
+            c_password = #{c_password},
         WHERE id = #{id}
+    </update>
+    <update id="updateC_org" >
+        update  company SET c_org = #{c_org} where c_username = #{c_username}
     </update>
 
 </mapper>

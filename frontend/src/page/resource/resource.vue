@@ -1,22 +1,29 @@
 <template>
   <div class="heading">生产资源结构图</div>
   <div style="height: 520px; width: 100%;">
-    <vue3-tree-org
-        :data="resource"
-        center
-        default-expand-level="1"
-        :horizontal="false"
-        :collapsable="true"
-        :only-one-node="false"
-        label-style="background: #fff; color: #5e6d82"
-        :clone-node-drag="cloneNodeDrag"
-        :before-drag-end="beforeDragEnd"
-        @on-node-drag="nodeDragMove"
-        @on-node-drag-end="nodeDragEnd"
-        @on-contextmenu="onMenus"
-        @on-expand="onExpand"
-        @on-node-dblclick="onNodeDblclick"
-    />
+    <el-tabs type="border-card">
+      <el-tab-pane
+          :label="resource.label"
+          style="height: 450px; width: 100%;"
+      >
+      <vue3-tree-org
+          :data="resource"
+          center
+          default-expand-level="1"
+          :horizontal="false"
+          :collapsable="true"
+          :only-one-node="false"
+          label-style="background: #fff; color: #5e6d82"
+          :clone-node-drag="cloneNodeDrag"
+          :before-drag-end="beforeDragEnd"
+          @on-node-drag="nodeDragMove"
+          @on-node-drag-end="nodeDragEnd"
+          @on-contextmenu="onMenus"
+          @on-expand="onExpand"
+          @on-node-dblclick="onNodeDblclick"
+      />
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
