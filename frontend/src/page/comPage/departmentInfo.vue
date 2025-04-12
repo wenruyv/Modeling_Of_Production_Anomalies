@@ -3,7 +3,7 @@
       <el-button type="primary"
                  @click="dialogFormVisible = true"
                  size="large"
-                 style="width: 100px;float: right;">添加部门</el-button>
+                 style="width: 140px;float: right;">添加部门管理员</el-button>
     </div>
     <div>
 
@@ -16,7 +16,7 @@
       </el-table>
 
       <!-- 弹窗添加部门-->
-      <el-dialog v-model="dialogFormVisible" title="添加部门信息">
+      <el-dialog v-model="dialogFormVisible" title="添加部门管理员信息">
         <el-form :model="depart" :rules="rules" ref="companyForm" label-width="120px">
           <el-form-item label="部门" prop="department">
             <el-tree-select
@@ -79,7 +79,7 @@ export default{
       d_password: '',
     })
     const treeProps = {
-      value: 'id',      // 使用您数据中的 'id' 字段作为值
+      value: 'label',      // 使用您数据中的 'id' 字段作为值
       label: 'label',   // 使用 'label' 字段作为显示文本
       children: 'children' // 子节点字段名
     };
@@ -102,7 +102,7 @@ export default{
         const res = await new proxy.$request(proxy.$urls.m().isEmptyOrg  + '?c_username=' + c_username).modeget();
         console.log(res)
         if (res && res.data && Array.isArray(res.data)) {
-          organization.value = res.data;
+          organization.value = processTreeData(res.data);
           console.log("organization");
           console.log(organization);
         } else {
@@ -112,6 +112,19 @@ export default{
         console.log(error);
         new proxy.$tips('服务器发生错误', 'error').message_();
       }
+    }
+    function processTreeData(nodes) {
+      return nodes.map(node => {
+        // 如果是根节点，只保留其直接子节点
+        return {
+          ...node,
+          children: node.children ? node.children.map(child => ({
+            ...child,
+            // 移除二级节点的子节点
+            children: undefined
+          })) : undefined
+        };
+      });
     }
     const rules = {
       department: [{ required: true, message: '请选择部门', trigger: 'change' }],
@@ -195,5 +208,4 @@ export default{
 </script>
 
 <style>
-
 </style>
