@@ -29,11 +29,13 @@ const urls = class{
         const isEmptyOrg = `${url}organization/isEmptyOrg`
         const addDepartment = `${url}depart/addDepartment`
         const departmentList = `${url}depart/list`
+        const staffList = `${url}staff/list`
+        const addStaff = `${url}staff/addStaff`
 
         return {
              login,
             user, company_list, add_company, ab_class,orgTree,resourceTree,informationTree,saveTree,updateTree,addTree,deleteTree,
-            companyIndex,loadCompany,updateCompany,updateC_org,isEmptyOrg,addDepartment,departmentList,
+            companyIndex,loadCompany,updateCompany,updateC_org,isEmptyOrg,addDepartment,departmentList,staffList,addStaff
         }
     }
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.StaffMapper">
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.Staff">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="gender" jdbcType="VARCHAR" property="gender"/>
+        <result column="birth_date" jdbcType="VARCHAR" property="birth_date"/>
+        <result column="id_number" jdbcType="INTEGER" property="id_number"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="position" jdbcType="VARCHAR" property="position"/>
+        <result column="department" jdbcType="VARCHAR" property="department"/>
+        <result column="hire_date" jdbcType="VARCHAR" property="hire_date"/>
+        <result column="group1" jdbcType="VARCHAR" property="group1"/>
+        <result column="group_leader" jdbcType="VARCHAR" property="group_leader"/>
+    </resultMap>
+    <select id="staffList" resultMap="BaseResultMap">
+        select * from staff
+    </select>
+    <insert id="addStaff">
+        insert into staff (id,name,gender,birth_date,id_number,phone,email,position,department,hire_date,group1,group_leader)
+        values (#{id},#{name},#{gender},#{birth_date},#{id_number},#{phone},#{email},#{position},#{department},#{hire_date},#{group1},#{group_leader})
+    </insert>
+
+</mapper>

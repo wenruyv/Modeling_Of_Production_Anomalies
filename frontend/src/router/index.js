@@ -88,7 +88,7 @@ const routes = [
             {
                 path: '/peopleList', //员工列表
                 name: 'peopleList',
-                component: () => import('@/page/comPage/comPeople.vue')
+                component: () => import('@/page/comPage/comStaff.vue')
             },
 
         ]
