@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.DepartmentMapper">
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.Department">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="department" jdbcType="LONGVARCHAR" property="department"/>
+        <result column="d_username" jdbcType="LONGVARCHAR" property="d_username"/>
+        <result column="d_password" jdbcType="LONGVARCHAR" property="d_password"/>
+
+    </resultMap>
+    <select id="depList" resultMap="BaseResultMap">
+        select * from department
+    </select>
+    <insert id="addDepartment">
+        insert into department (id,department,d_username,d_password)
+        values (#{id},#{department},#{d_username},#{d_password})
+    </insert>
+</mapper>

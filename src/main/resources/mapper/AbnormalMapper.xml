@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.AbnormalMapper">
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.AbnormalClass">
+        <id column="ab_id" jdbcType="INTEGER" property="ab_id"/>
+        <result column="ab_class" jdbcType="LONGVARCHAR" property="ab_class"/>
+        <result column="ab_level1" jdbcType="LONGVARCHAR" property="ab_level1"/>
+        <result column="ab_level2" jdbcType="LONGVARCHAR" property="ab_level2"/>
+        <result column="ab_def" jdbcType="LONGVARCHAR" property="ab_def"/>
+        <result column="ab_scene" jdbcType="LONGVARCHAR" property="ab_scene"/>
+        <result column="ab_effect" jdbcType="LONGVARCHAR" property="ab_effect"/>
+        <result column="ab_solve" jdbcType="LONGVARCHAR" property="ab_solve"/>
+        <result column="ab_unit" jdbcType="LONGVARCHAR" property="ab_unit"/>
+    </resultMap>
+    <select id="abnormalList" resultMap="BaseResultMap">
+        select * from abnormal_classify
+    </select>
+
+
+</mapper>

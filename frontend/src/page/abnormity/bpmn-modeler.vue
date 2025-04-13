@@ -32,13 +32,11 @@
 <script setup>
 import { onMounted, ref, reactive } from 'vue';
 import BpmnModeler from "bpmn-js/lib/Modeler";
-import is from "bpmn-js/lib/util/ModelUtil";
 import axios from "axios";
 import {ElMessage} from "element-plus";
 
 // 定义 ref
 const canvas = ref(null);
-const refFile = ref(null);
 const xmlName = ref('empty');
 const xmlStrRef = ref();
 const xmlId = ref(9);
@@ -60,8 +58,8 @@ const saveChange = async () => {
     const { xml } = result;
     // 更新 xmlStrRef 的值为最新的 XML 代码
     xmlStrRef.value = xml;
-
-    const response = await axios.put(`bpmn-xml/updateByName/${selectedOption.value}`, {
+    // console.log("selectedOption.value:"+selectedOption.value);
+    const response = await axios.put(`api/bpmn-xml/updateByName/${selectedOption.value}`, {
       data: xmlStrRef.value // 假设 xmlStrRef 存储了修改后的 XML 代码
     });
     ElMessage.success('保存成功')
@@ -140,7 +138,7 @@ const init = async () => {
 // 获取后端XML数据的方法
 const fetchXmlData = async (xmlId) => {
   try {
-    const url = `bpmn-xml/findById/${xmlId}`;
+    const url = `api/bpmn-xml/findById/${xmlId}`;
     const response = await axios.get(url);
     // 假设后端返回的XML数据在响应的data字段中
     xmlStrRef.value = response.data.data;
