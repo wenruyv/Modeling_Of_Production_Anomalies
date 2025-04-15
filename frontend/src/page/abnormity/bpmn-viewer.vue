@@ -125,8 +125,8 @@ const dialogTitle = ref('原材料供应延迟');
 const saving = ref(false);
 const deleting = ref(false);
 const currentElement = ref(null);
-// 在原有响应式数据中添加模拟状态
-const simulationActive = ref(true);
+const resultName = ref();
+const resultSimilarity = ref();
 
 const init = async () => {
   canvas.value = document.querySelector('.canvas');
@@ -390,12 +390,36 @@ const handleSearch = async () => {
   }
 
   try {
+    const response = await axios.post('http://localhost:8000/api/standardize', {
+      user_input: keyword
+    });
+
+    if (response.data.status === 'success') {
+      // return response.data.data.standardized;
+      resultName.value = response.data.data.standardized;
+      resultSimilarity.value = response.data.data.similarity;
+      console.log("标准化："+resultName.value+" "+resultSimilarity.value)
+    } else {
+      ElMessage.error('标准化失败: ' + response.data.message);
+    }
+  } catch (error) {
+    ElMessage.error('请求失败: ' + error.message);
+  }
+  if(resultSimilarity.value < 0.7){
+    ElMessage.warning('无法标准化异常，请自行输入或添加: ');
+    return;
+  }
+
+
+  try {
     searching.value = true;
     // console.log('搜索内容：', keyword);
-    const url = `/api/abnormalityCategories/findByName/${keyword}`;
+    const url = `/api/abnormalityCategories/findByName/${resultName.value}`;
     const response = await axios.get(url);
     taskData.value = response.data;
     if (taskData.value) {
+      searchKeyword.value = resultName.value;
+
       ElMessage.success('查询成功');
     } else {
       ElMessage.warning('结果不存在');
