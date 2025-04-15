@@ -13,10 +13,36 @@
         <result column="ab_effect" jdbcType="LONGVARCHAR" property="ab_effect"/>
         <result column="ab_solve" jdbcType="LONGVARCHAR" property="ab_solve"/>
         <result column="ab_unit" jdbcType="LONGVARCHAR" property="ab_unit"/>
+        <result column="ab_important" jdbcType="LONGVARCHAR" property="ab_important"/>
     </resultMap>
     <select id="abnormalList" resultMap="BaseResultMap">
         select * from abnormal_classify
     </select>
-
-
+    <!-- 新增记录 -->
+    <insert id="insertAbnormal" parameterType="com.example.modeling_of_production_anomalies.entity.AbnormalClass">
+        insert into abnormal_classify (ab_class, ab_level1, ab_level2, ab_def, ab_scene, ab_effect, ab_solve, ab_unit,ab_important)
+        values (#{ab_class}, #{ab_level1}, #{ab_level2}, #{ab_def}, #{ab_scene}, #{ab_effect}, #{ab_solve}, #{ab_unit},#{ab_important})
+    </insert>
+    <!-- 根据 ab_id 删除记录 -->
+    <delete id="deleteAbnormalById" parameterType="int">
+        delete from abnormal_classify where ab_id = #{ab_id}
+    </delete>
+    <!-- 根据 ab_id 修改记录 -->
+    <update id="updateAbnormal" parameterType="com.example.modeling_of_production_anomalies.entity.AbnormalClass">
+        update abnormal_classify
+        set ab_class = #{ab_class},
+            ab_level1 = #{ab_level1},
+            ab_level2 = #{ab_level2},
+            ab_def = #{ab_def},
+            ab_scene = #{ab_scene},
+            ab_effect = #{ab_effect},
+            ab_solve = #{ab_solve},
+            ab_unit = #{ab_unit},
+            ab_important = #{ab_important}
+        where ab_id = #{ab_id}
+    </update>
+    <!-- 根据 ab_level2 查询记录 -->
+    <select id="selectAbnormalByLevel2" resultMap="BaseResultMap">
+        select * from abnormal_classify where ab_level2 = #{ab_level2}
+    </select>
 </mapper>

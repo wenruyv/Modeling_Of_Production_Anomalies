@@ -82,15 +82,15 @@
       <div v-if="taskData" class="result-panel">
         <div class="result-item">
           <span class="label">异常名称：</span>
-          <span class="value">{{ taskData.name }}</span>
+          <span class="value">{{ taskData.ab_level2 }}</span>
         </div>
         <div class="result-item">
           <span class="label">异常定义：</span>
-          <span class="value">{{ taskData.description }}</span>
+          <span class="value">{{ taskData.ab_def }}</span>
         </div>
         <div class="result-item">
           <span class="label">异常等级：</span>
-          <span class="value">{{ taskData.important }}</span>
+          <span class="value">{{ taskData.ab_important }}</span>
         </div>
       </div>
     </el-dialog>
@@ -153,8 +153,8 @@ const init = async () => {
       try {
         const response1 = await axios.get(`/api/abnormality-calibrations/search/${element.id}`);
         const abName = response1.data.name;
-        const response2 = await axios.get(`/api/abnormalityCategories/findByName/${abName}`);
-        const important = response2.data.important;
+        const response2 = await axios.get(`/api/abnormal/selectByLevel2/${abName}`);
+        const important = response2.data[0].ab_important;
 
         const modeling = bpmnViewer.value.get('modeling');
 
@@ -281,9 +281,8 @@ const fetchTaskData = async (taskId) => {
       dialogTitle.value = '尚未定义';
     } else {
       dialogTitle.value = taskData.value.name;
-      const url = `/api/abnormalityCategories/findByName/${taskData.value.name}`;
-      const response = await axios.get(url);
-      taskData.value = response.data;
+      const response = await axios.get(`/api/abnormal/selectByLevel2/${taskData.value.name}`);
+      taskData.value = response.data[0];
     }
   } catch (error) {
     console.error('获取任务数据失败:', error);
@@ -334,12 +333,12 @@ const handleDelete = async () => {
 
 //保存某种异常
 const handleSave = async () => {
-  if (!taskData.value?.name) {
+  if (!taskData.value?.ab_level2) {
     ElMessage.warning('该异常不存在，请正确输入异常名称');
     return;
   }
 
-  if (taskData.value.name !== searchKeyword.value) {
+  if (taskData.value.ab_level2 !== searchKeyword.value) {
     ElMessage.warning('输入的异常名称与搜索关键词不匹配，请检查后重新输入');
     return;
   }
@@ -414,9 +413,9 @@ const handleSearch = async () => {
   try {
     searching.value = true;
     // console.log('搜索内容：', keyword);
-    const url = `/api/abnormalityCategories/findByName/${resultName.value}`;
+    const url = `/api/abnormal/selectByLevel2/${resultName.value}`;
     const response = await axios.get(url);
-    taskData.value = response.data;
+    taskData.value = response.data[0];
     if (taskData.value) {
       searchKeyword.value = resultName.value;
 
