@@ -1,215 +1,264 @@
 <template>
-  <div class="containers">
-    <div class="canvas" ref="canvas"></div>
+  <div class="ordering">
+    <div class="containers">
+      <div class="canvas"
+           ref="canvas"
+           @wheel="handleZoom">
+      </div>
 
-    <ul class="buttons">
-      <li>
-        <a href="javascript:" @click="$refs.refFile.click()">加载本地XML文件</a>
-        <input
-          type="file"
-          id="files"
-          ref="refFile"
-          style="display: none"
-          @change="loadXML"
-        />
-      </li>
-      <li>
-        <a href="javascript:" @click="saveXML" title="保存为bpmn"
-          >保存为XML文件</a
-        >
-      </li>
-      <li>
-        <a href="javascript:" @click="saveSVG" title="保存为svg"
-          >保存为SVG图片</a
-        >
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerUndo" title="撤销操作">撤销</a>
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerRedo" title="恢复操作">恢复</a>
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerZoom(0.1)" title="放大">放大</a>
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerZoom(-0.1)" title="缩小">缩小</a>
-      </li>
-      <li>
-        <a href="javascript:" @click="handlerZoom(0)" title="还原">还原</a>
-      </li>
-    </ul>
+      <ul class="buttons">
+        <li>
+          <el-select v-model="selectedOption" @change="openXml" placeholder="请选择" style="width: 100px">
+            <el-option label="交互定制" value="interactiveCustomizationXML"></el-option>
+            <el-option label="研发创新" value="developmentInnovationXML"></el-option>
+            <el-option label="精准营销" value="precisionMarketingXML"></el-option>
+            <el-option label="协同采购" value="collaborativePurchasingXML"></el-option>
+            <el-option label="智能生产" value="intelligentProductionXML"></el-option>
+            <el-option label="智慧物流" value="intelligentLogisticsXML"></el-option>
+            <el-option label="智慧服务" value="intelligentServiceXML"></el-option>
+          </el-select>
+        </li>
+        <li>
+          <el-button @click="saveChange" title="保存修改">保存</el-button>
+        </li>
+        <li>
+          <el-button @click="saveSVG" title="保存为图片">保存为图片</el-button>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { onMounted, ref, reactive } from 'vue';
 import BpmnModeler from "bpmn-js/lib/Modeler";
-import { xmlStr } from "@/mock/xmlStr";
-import is from "bpmn-js/lib/util/ModelUtil";
+import axios from "axios";
+import {ElMessage} from "element-plus";
 
-export default {
-  mounted() {
-    this.init();
-    console.log("bpmnModeler");
-  },
-  data() {
-    return {
-      bpmnModeler: null,
-      container: null,
-      canvas: null,
-      xmlStr: xmlStr
-    };
-  },
-  methods: {
-    init() {
-      const canvas = this.$refs.canvas;
-      this.bpmnModeler = new BpmnModeler({
-        container: canvas
-      });
+// 定义 ref
+const canvas = ref(null);
+const xmlName = ref('empty');
+const xmlStrRef = ref();
+const xmlId = ref(9);
+const selectedOption = ref('');
 
-      this.createNewDiagram();
-    },
-    async createNewDiagram() {
-      try {
-        const result = await this.bpmnModeler.importXML(this.xmlStr);
-        const { warnings } = result;
-        console.log(warnings);
+// 定义响应式数据
+const state = reactive({
+  bpmnModeler: null,
+  xmlStr: '',
+  scale: 1.0
+});
 
-        this.success();
-      } catch (err) {
-        console.log(err.message, err.warnings);
-      }
-    },
-    success() {
-      this.addModelerListener();
-      this.addEventBusListener();
-    },
-    async loadXML() {
-      const that = this;
-      const file = this.$refs.refFile.files[0];
+const saveChange = async () => {
+  try {
+    // console.log(selectedOption.value);
 
-      var reader = new FileReader();
-      reader.readAsText(file);
-      reader.onload = function() {
-        that.xmlStr = this.result;
-        that.createNewDiagram();
-      };
-    },
-    async saveXML() {
-      try {
-        const result = await this.bpmnModeler.saveXML({ format: true });
-        const { xml } = result;
-
-        // 创建一个Blob对象，用于存储XML数据
-        var xmlBlob = new Blob([xml], {
-          type: "application/xml;charset=UTF-8"
-        });
-
-        // 创建一个<a>元素用于下载
-        var downloadLink = document.createElement("a");
-        // 修改下载文件的名称为XML文件
-        downloadLink.download = "ops-coffee.xml";
-        downloadLink.innerHTML = "Get XML";
-        // 创建一个URL对象，指向Blob数据
-        downloadLink.href = window.URL.createObjectURL(xmlBlob);
-        // 点击下载链接后，从文档中移除该链接
-        downloadLink.onclick = function(event) {
-          document.body.removeChild(event.target);
-        };
-        // 隐藏下载链接
-        downloadLink.style.visibility = "hidden";
-        // 将下载链接添加到文档中
-        document.body.appendChild(downloadLink);
-        // 触发点击事件，开始下载
-        downloadLink.click();
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    async saveSVG() {
-      try {
-        const result = await this.bpmnModeler.saveSVG();
-        const { svg } = result;
-
-        const svgBlob = new Blob([svg], {
-          type: "image/svg+xml"
-        });
-
-        var downloadLink = document.createElement("a");
-        downloadLink.download = "ops-coffee-bpmn.svg";
-        downloadLink.innerHTML = "Get BPMN SVG";
-        downloadLink.href = window.URL.createObjectURL(svgBlob);
-        downloadLink.onclick = function(event) {
-          document.body.removeChild(event.target);
-        };
-        downloadLink.style.visibility = "hidden";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    handlerRedo() {
-      this.bpmnModeler.get("commandStack").redo();
-    },
-    handlerUndo() {
-      this.bpmnModeler.get("commandStack").undo();
-    },
-    handlerZoom(radio) {
-      const newScale = !radio ? 1.0 : this.scale + radio;
-      this.bpmnModeler.get("canvas").zoom(newScale);
-
-      this.scale = newScale;
-    },
-    addModelerListener() {
-      const that = this;
-
-      that.bpmnModeler.on("element.click", e => {
-        console.log("modelerListener", e);
-      });
-    },
-    addEventBusListener() {
-      const that = this;
-      const eventBus = this.bpmnModeler.get("eventBus");
-
-      eventBus.on("element.click", function(e) {
-        that.elementClick(e);
-      });
-    },
-    elementClick(e) {
-      const that = this;
-      const modeling = this.bpmnModeler.get("modeling");
-
-      if (e.element.businessObject.$type === "bpmn:StartEvent") {
-        console.log(
-          "这是一个开始节点",
-          e.element.businessObject.id,
-          e.element.businessObject.$type,
-          e.element.businessObject.name
-        );
-
-        // 修改节点ID
-        modeling.updateProperties(e.element, {
-          id: "StartEvent_ops_coffee"
-        });
-      }
-
-      if (e.element.businessObject.$type === "bpmn:UserTask") {
-        console.log(
-          "这是一个用户节点",
-          e.element.businessObject.id,
-          e.element.businessObject.$type,
-          e.element.businessObject.name
-        );
-
-        // 修改节点名称
-        modeling.updateProperties(e.element, {
-          name: "ops-coffee.cn"
-        });
-      }
-    }
+    // 获取最新的 XML 代码
+    const result = await state.bpmnModeler.saveXML({ format: true });
+    const { xml } = result;
+    // 更新 xmlStrRef 的值为最新的 XML 代码
+    xmlStrRef.value = xml;
+    // console.log("selectedOption.value:"+selectedOption.value);
+    const response = await axios.put(`api/bpmn-xml/updateByName/${selectedOption.value}`, {
+      data: xmlStrRef.value // 假设 xmlStrRef 存储了修改后的 XML 代码
+    });
+    ElMessage.success('保存成功')
+  } catch (error) {
+    ElMessage.error('保存失败')
   }
 };
+
+const openXml = async (value) => {
+  // 这里你可以根据不同的选择值设置不同的 xmlStrRef 值
+  // 假设每个选项对应不同的 XML 字符串，你可以根据实际情况修改
+  switch (value) {
+    case 'interactiveCustomizationXML':
+      xmlName.value = 'interactiveCustomizationXML'
+      xmlId.value = 7;
+      break;
+    case 'developmentInnovationXML':
+      xmlName.value = 'developmentInnovationXML'
+      xmlId.value = 3;
+      break;
+    case 'precisionMarketingXML':
+      xmlName.value = 'precisionMarketingXML'
+      xmlId.value = 8;
+      break;
+    case 'collaborativePurchasingXML':
+      xmlName.value = 'collaborativePurchasingXML'
+      xmlId.value = 1;
+      break;
+    case 'intelligentProductionXML':
+      xmlName.value = 'intelligentProductionXML'
+      xmlId.value = 5;
+      break;
+    case 'intelligentLogisticsXML':
+      xmlName.value = 'intelligentLogisticsXML'
+      xmlId.value = 4;
+      break;
+    case 'intelligentServiceXML':
+      xmlName.value = 'intelligentServiceXML'
+      xmlId.value = 6;
+      break;
+    default:
+      xmlName.value = 'empty';
+  }
+  // 清空当前视图
+  state.bpmnModeler.clear();
+  // 导入新的 XML 数据
+  try {
+    await fetchXmlData(xmlId.value);
+    const result = await state.bpmnModeler.importXML(xmlStrRef.value);
+    const {warnings} = result;
+    console.log(warnings);
+
+    // 屏幕自适应
+    const canvasInstance = state.bpmnModeler.get('canvas');
+    canvasInstance.zoom('fit-viewport', true);
+  } catch (err) {
+    console.log(err.message, err.warnings);
+  }
+};
+
+
+
+// 初始化方法
+const init = async () => {
+  canvas.value = document.querySelector('.canvas');
+  state.bpmnModeler = new BpmnModeler({
+    container: canvas.value
+  });
+
+  // 调用获取XML数据的方法
+  await fetchXmlData(xmlId.value);
+
+  await createNewDiagram();
+};
+
+// 获取后端XML数据的方法
+const fetchXmlData = async (xmlId) => {
+  try {
+    const url = `api/bpmn-xml/findById/${xmlId}`;
+    const response = await axios.get(url);
+    // 假设后端返回的XML数据在响应的data字段中
+    xmlStrRef.value = response.data.data;
+    // console.log(xmlStrRef.value);
+  } catch (error) {
+    console.error('获取XML数据时出错:', error);
+  }
+};
+
+// 创建新图表方法
+const createNewDiagram = async () => {
+  try {
+    const result = await state.bpmnModeler.importXML(xmlStrRef.value);
+    const { warnings } = result;
+    console.log(warnings);
+
+    // 屏幕自适应
+    const canvasInstance = state.bpmnModeler.get('canvas');
+    canvasInstance.zoom('fit-viewport');
+
+    // 将内容居中显示
+    canvasInstance.center();
+
+    success();
+  } catch (err) {
+    // console.log(err.message, err.warnings);
+  }
+};
+
+// 成功回调方法
+const success = () => {
+  addModelerListener();
+  addEventBusListener();
+};
+
+// 处理鼠标滚轮事件，实现放大缩小
+const handleZoom = (event) => {
+  event.preventDefault();
+  const canvasInstance = state.bpmnModeler.get('canvas');
+  const currentScale = canvasInstance.zoom();
+  const delta = event.deltaY > 0 ? -0.1 : 0.1; // 滚轮向下为缩小，向上为放大
+  const newScale = Math.max(0.1, Math.min(2.0, currentScale + delta)); // 限制缩放范围
+  canvasInstance.zoom(newScale, { x: event.offsetX, y: event.offsetY });
+};
+
+// 保存为 SVG 文件方法
+const saveSVG = async () => {
+  try {
+    const result = await state.bpmnModeler.saveSVG();
+    const { svg } = result;
+
+    const svgBlob = new Blob([svg], {
+      type: "image/svg+xml"
+    });
+
+    const downloadLink = document.createElement("a");
+    downloadLink.download = "ops-coffee-bpmn.svg";
+    downloadLink.innerHTML = "Get BPMN SVG";
+    downloadLink.href = window.URL.createObjectURL(svgBlob);
+    downloadLink.onclick = (event) => {
+      document.body.removeChild(event.target);
+    };
+    downloadLink.style.visibility = "hidden";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+// 添加模型监听器方法
+const addModelerListener = () => {
+  state.bpmnModeler.on("element.click", (e) => {
+    console.log("modelerListener", e);
+  });
+};
+
+// 添加事件总线监听器方法
+const addEventBusListener = () => {
+  const eventBus = state.bpmnModeler.get("eventBus");
+  eventBus.on("element.click", (e) => {
+    elementClick(e);
+  });
+};
+
+// 元素点击事件处理方法
+const elementClick = (e) => {
+  const modeling = state.bpmnModeler.get("modeling");
+
+  if (e.element.businessObject.$type === "bpmn:StartEvent") {
+    console.log(
+        "这是一个开始节点",
+        e.element.businessObject.id,
+        e.element.businessObject.$type,
+        e.element.businessObject.name
+    );
+
+    modeling.updateProperties(e.element, {
+      id: "StartEvent_ops_coffee"
+    });
+  }
+
+  if (e.element.businessObject.$type === "bpmn:UserTask") {
+    console.log(
+        "这是一个用户节点",
+        e.element.businessObject.id,
+        e.element.businessObject.$type,
+        e.element.businessObject.name
+    );
+
+    modeling.updateProperties(e.element, {
+      name: "ops-coffee.cn"
+    });
+  }
+};
+
+// 挂载完成后初始化
+onMounted(() => {
+  init();
+});
 </script>
 
 <style scoped>
@@ -223,18 +272,18 @@ export default {
 }
 .buttons {
   position: absolute;
-  left: 170px;
-  bottom: 20px;
+  left: 5px;
+  bottom: 5px;
 }
 .buttons li {
   display: inline-block;
-  margin: 5px;
+  margin: 2px;
 }
 .buttons li a {
   color: #333;
   background: #fff;
   cursor: pointer;
-  padding: 8px;
+  padding: 2px;
   border: 1px solid #ccc;
   text-decoration: none;
 }

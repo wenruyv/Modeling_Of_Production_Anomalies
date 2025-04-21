@@ -20,8 +20,8 @@ public class DepartmentController {
     @Autowired
     private UserService userService;
     @RequestMapping("/list")
-    public List<Department> getDepList(){
-        List<Department> list = departmentService.depList();
+    public List<Department> getDepList(@RequestParam int com_id ){
+        List<Department> list = departmentService.depList(com_id);
         System.out.println(list);
         return list;
     }
@@ -34,13 +34,24 @@ public class DepartmentController {
         duser.setPassword(department.getD_password());
         duser.setUser_type(3);
         // 添加Duser到数据库
-        int newDuser = userService.addDuser(duser);
+        int newDuser = userService.addUser(duser);
 
         // 输出调试信息
         System.out.println("公司添加结果: " + newDep);
         System.out.println("企业管理员添加结果: " + newDuser);
 
         return newDep;
+    }
+    @GetMapping("/depInfo")
+    public Department depInfo(@RequestParam String d_username){
+        Department department = departmentService.selectByD_username(d_username);
+        return department;
+    }
+    @PostMapping("/updateDep")
+    public int updateDep(@RequestBody Department department) {
+        int result = departmentService.updateDep(department);
+        if(result == 1) return result;
+        else return 0;
     }
 
 }

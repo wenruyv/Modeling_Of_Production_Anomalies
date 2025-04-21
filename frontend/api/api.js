@@ -32,10 +32,15 @@ const urls = class{
         const staffList = `${url}staff/list`
         const addStaff = `${url}staff/addStaff`
 
+        //部门管理员获取部门信息
+        const loadDep = `${url}depart/depInfo`
+        const updateDep = `${url}depart/updateDep`
+
         return {
              login,
             user, company_list, add_company, ab_class,orgTree,resourceTree,informationTree,saveTree,updateTree,addTree,deleteTree,
-            companyIndex,loadCompany,updateCompany,updateC_org,isEmptyOrg,addDepartment,departmentList,staffList,addStaff
+            companyIndex,loadCompany,updateCompany,updateC_org,isEmptyOrg,addDepartment,departmentList,staffList,addStaff,
+            loadDep,updateDep
         }
     }
 

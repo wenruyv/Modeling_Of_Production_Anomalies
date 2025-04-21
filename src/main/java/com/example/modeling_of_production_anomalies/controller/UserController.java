@@ -42,4 +42,18 @@ public class UserController {
         System.out.println(list);
         return list;
     }
+    @PostMapping("/add")
+    public int addUser(@RequestBody User user){
+        int result = userService.addUser(user);
+        return result;
+    }
+    @PostMapping("/update")
+    public int updateUser(@RequestBody User user){
+        int result = userService.updateUser(user);
+        return result;
+    }
+    @DeleteMapping("/delete/{user_id}")
+    public int deleteUserById(@PathVariable int user_id){
+        return userService.deleteUserById(user_id);
+    }
 }

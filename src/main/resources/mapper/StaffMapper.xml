@@ -12,17 +12,20 @@
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="position" jdbcType="VARCHAR" property="position"/>
+        <id column="dep_id" jdbcType="INTEGER" property="dep_id"/>
         <result column="department" jdbcType="VARCHAR" property="department"/>
         <result column="hire_date" jdbcType="VARCHAR" property="hire_date"/>
         <result column="group1" jdbcType="VARCHAR" property="group1"/>
         <result column="group_leader" jdbcType="VARCHAR" property="group_leader"/>
+        <id column="com_id" jdbcType="INTEGER" property="com_id"/>
+        <result column="com_name" jdbcType="VARCHAR" property="com_name"/>
     </resultMap>
     <select id="staffList" resultMap="BaseResultMap">
         select * from staff
     </select>
     <insert id="addStaff">
-        insert into staff (id,name,gender,birth_date,id_number,phone,email,position,department,hire_date,group1,group_leader)
-        values (#{id},#{name},#{gender},#{birth_date},#{id_number},#{phone},#{email},#{position},#{department},#{hire_date},#{group1},#{group_leader})
+        insert into staff (id,name,gender,birth_date,id_number,phone,email,position,dep_id,department,hire_date,group1,group_leader,com_id,com_name)
+        values (#{id},#{name},#{gender},#{birth_date},#{id_number},#{phone},#{email},#{position},#{dep_id},#{department},#{hire_date},#{group1},#{group_leader},#{com_id},#{com_name})
     </insert>
 
 </mapper>

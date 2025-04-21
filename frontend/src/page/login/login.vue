@@ -46,11 +46,16 @@ export default {
         if (res.data) {
 
           if(res.data.user_type == 1){
+            localStorage.setItem('s_username', res.data.username);
             await router.push({name:'index'})
           }else if(res.data.user_type == 2){
             // 保存账户信息到 localStorage
             localStorage.setItem('c_username', res.data.username);
             await router.push({name:'comIndex'})
+          }else if(res.data.user_type == 3){
+            // 保存账户信息到 localStorage
+            localStorage.setItem('d_username', res.data.username);
+            await router.push({name:'depIndex'})
           }
           new proxy.$tips('登陆成功', 'success').message_();
          }else{

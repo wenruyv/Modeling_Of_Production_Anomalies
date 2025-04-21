@@ -10,7 +10,9 @@ import java.util.List;
 @Mapper
 @Repository
 public interface DepartmentMapper {
-    List<Department> depList();
+    List<Department> depList(int com_id);
     int addDepartment(Department department);
+    Department selectByD_username(String d_username);
+    int updateDep(Department department);
 
 }

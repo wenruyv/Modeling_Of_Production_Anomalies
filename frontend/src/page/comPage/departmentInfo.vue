@@ -8,37 +8,68 @@
     <div>
 
       <el-card class="box-card" style="width: 100%">
-      <el-table :data="paginatedData" style="width: 100%">
+      <el-table :data="paginatedData" stripe style="width: 100%">
         <!--        <el-table-column prop="id" label="id" min-width="100" />-->
         <el-table-column prop="department" label="部门" min-width="100" />
+        <el-table-column prop="d_name" label="负责人姓名" min-width="100" />
         <el-table-column prop="d_username" label="管理员账号" min-width="100"/>
         <el-table-column prop="d_password" label="管理员密码" min-width="100"/>
+        <el-table-column prop="location" label="办公地点" min-width="100"/>
       </el-table>
 
       <!-- 弹窗添加部门-->
       <el-dialog v-model="dialogFormVisible" title="添加部门管理员信息">
-        <el-form :model="depart" :rules="rules" ref="companyForm" label-width="120px">
-          <el-form-item label="部门" prop="department">
-            <el-tree-select
-                v-model="depart.department"
-                :data="organization"
-                :props="treeProps"
-                :render-after-expand="false"
-                placeholder="请选择部门"
-                size="large"
-            />
-          </el-form-item>
-          <el-form-item label="管理员账号" prop="d_username">
-            <el-input v-model="depart.d_username" size="large"/>
-          </el-form-item>
-          <el-form-item label="管理员密码" prop="d_password">
-            <el-input v-model="depart.d_password" size="large"/>
+        <el-form :model="depart" :rules="rules" ref="depForm" label-width="120px">
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="部门" prop="department">
+                <el-tree-select
+                    v-model="depart.department"
+                    :data="organization"
+                    :props="treeProps"
+                    :render-after-expand="false"
+                    placeholder="请选择部门"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="负责人姓名" prop="d_name">
+                <el-input v-model="depart.d_name" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="管理员账号" prop="d_username">
+                <el-input v-model="depart.d_username" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="管理员密码" prop="d_password">
+                <el-input v-model="depart.d_password" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="办公地点" prop="location">
+                <el-input v-model="depart.location" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="所属公司" prop="com_name">
+                <el-input v-model="depart.com_name" disabled/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item label="部门介绍" prop="description">
+            <el-input v-model="depart.description" type="textarea" />
           </el-form-item>
         </el-form>
         <template #footer>
           <span class="dialog-footer">
             <el-button @click="handleDialogClose" >取消</el-button>
-            <el-button type="primary" @click="insertCom" >
+            <el-button type="primary" @click="insertDep" >
               添加
             </el-button>
           </span>
@@ -77,6 +108,11 @@ export default{
       department: '',
       d_username: '',
       d_password: '',
+      com_id:'',
+      com_name:'',
+      d_name:'',
+      location:'',
+      description:'',
     })
     const treeProps = {
       value: 'label',      // 使用您数据中的 'id' 字段作为值
@@ -87,12 +123,17 @@ export default{
       depart.department = '';
       depart.d_username = '';
       depart.d_password = '';
+      depart.com_id = '';
+      depart.com_name = '';
+      depart.d_name = '';
+      depart.location = '';
+      depart.description = '';
     };
 
 // 在弹窗关闭时调用
     const handleDialogClose = () => {
       dialogFormVisible.value = false;
-      proxy.$refs.companyForm?.resetFields();  // 重置表单及验证状态
+      proxy.$refs.depForm?.resetFields();  // 重置表单及验证状态
       resetForm();
     };
     //organization树形选择器数据
@@ -100,7 +141,6 @@ export default{
       try {
         const c_username = localStorage.getItem('c_username');
         const res = await new proxy.$request(proxy.$urls.m().isEmptyOrg  + '?c_username=' + c_username).modeget();
-        console.log(res)
         if (res && res.data && Array.isArray(res.data)) {
           organization.value = processTreeData(res.data);
           console.log("organization");
@@ -143,10 +183,18 @@ export default{
       const end = start + depart_data.pageSize;
       return depart_data.depart_array.slice(start, end);
     });
-    //加载公司列表
+    //加载部门列表
     async function depList(){
       try {
-        const res = await new proxy.$request(proxy.$urls.m().departmentList).modeget()
+        const c_username = localStorage.getItem('c_username');
+
+        const res1 = await new proxy.$request(proxy.$urls.m().loadCompany + '?c_username=' + c_username).modeget();
+        const com_id = res1.data.id;
+        depart.com_id = res1.data.id;
+        depart.com_name = res1.data.name;
+        console.log(depart.com_name );
+        // 正确传递com_id参数
+        const res = await new proxy.$request(proxy.$urls.m().departmentList + '?com_id=' + com_id).modeget();
         console.log(res)
         // 假设返回的res包含数据对象data和总条数total
         if (res && res.data && Array.isArray(res.data)) {
@@ -163,13 +211,8 @@ export default{
     }
 
     //添加新数据
-    const insertCom = async () => {
+    const insertDep = async () => {
       try {
-        const valid = await proxy.$refs.companyForm.validate();
-        console.log("表单验证结果" + valid);
-        if (!valid) {
-          return;  // 如果验证失败，直接返回
-        }
         const res = await new proxy.$request(proxy.$urls.m().addDepartment, depart).modepost();
         console.log(res);
         if (res.data == 1) {
@@ -195,7 +238,7 @@ export default{
       formLabelWidth,
       depart,
       rules,
-      insertCom,
+      insertDep,
       value,
       organization,
       orgTree,

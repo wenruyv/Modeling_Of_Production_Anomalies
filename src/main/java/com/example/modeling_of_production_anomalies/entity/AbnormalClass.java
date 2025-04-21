@@ -10,6 +10,8 @@ public class AbnormalClass {
     private String ab_effect;
     private String ab_solve;
     private String ab_unit;
+    private String ab_important;
+
 
     public int getAb_id() {
         return ab_id;
@@ -83,6 +85,14 @@ public class AbnormalClass {
         this.ab_unit = ab_unit;
     }
 
+    public String getAb_important() {
+        return ab_important;
+    }
+    public void setAb_important(String ab_important) {
+        this.ab_important = ab_important;
+    }
+
+
     @Override
     public String toString() {
         return "AbnormalClass{" +
@@ -95,6 +105,7 @@ public class AbnormalClass {
                 ", ab_effect='" + ab_effect + '\'' +
                 ", ab_solve='" + ab_solve + '\'' +
                 ", ab_unit='" + ab_unit + '\'' +
+                ", ab_important='" + ab_important + '\'' +
                 '}';
     }
 }

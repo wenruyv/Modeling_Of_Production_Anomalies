@@ -44,7 +44,7 @@
             web = #{web},
             introduction = #{introduction},
             c_username = #{c_username},
-            c_password = #{c_password},
+            c_password = #{c_password}
         WHERE id = #{id}
     </update>
     <update id="updateC_org" >

@@ -18,11 +18,17 @@
     <select id="UserList" resultMap="BaseResultMap">
         select * from user
     </select>
-    <insert id="addCuser">
+    <insert id="addUser">
         insert into user (username,password,user_type) values (#{username},#{password},#{user_type})
     </insert>
-    <insert id="addDuser">
-        insert into user (username,password,user_type) values (#{username},#{password},#{user_type})
-    </insert>
+    <update id="updateUser">
+        update user
+        set username = #{username},
+            password = #{password}
+        where user_id = #{user_id}
+    </update>
+    <delete id="deleteUserById">
+        delete from user where user_id = #{user_id}
+    </delete>
 
 </mapper>

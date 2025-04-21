@@ -31,14 +31,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int addCuser(User user) {
-        int newCuser = userMapper.addCuser(user);
-        return newCuser;
+    public int addUser(User user) {
+        int newUser = userMapper.addUser(user);
+        return newUser;
     }
 
     @Override
-    public int addDuser(User user) {
-        int newDuser = userMapper.addDuser(user);
-        return newDuser;
+    public int updateUser(User user) {
+        return userMapper.updateUser(user);
+    }
+
+    @Override
+    public int deleteUserById(int user_id) {
+        return userMapper.deleteUserById(user_id);
     }
 }

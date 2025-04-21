@@ -1,6 +1,5 @@
 <template>
   <div className="heading">组织结构</div>
-  <div>{{organization}}</div>
   <div>
     <el-tabs
         v-model="activeTabName"
@@ -9,23 +8,24 @@
         type="border-card"
     >
       <el-tab-pane
-          v-for="tab in organization"
+          v-for="tab in tempOrganization"
           :key="tab.name"
           :label="tab.label || `Tab ${tab.name}`"
           :name="tab.name"
           style="height: 410px; width: 100%;"
       >
-        <vue3-tree-org
-            :data="tab"
-            center
-            default-expand-level="10"
-            :horizontal="false"
-            :collapsable="true"
-            label-style="background: #fff; color: #5e6d82"
-            :node-draggable="false"
-            @on-contextmenu="onMenus"
-            @on-expand="onExpand"
-            @on-node-dblclick="onNodeDblclick"
+        <vue3-tree-org ref="treeOrg"
+                       :data="tab"
+                       center
+                       default-expand-level="10"
+                       :horizontal="false"
+                       :collapsable="true"
+                       label-style="background: #fff; color: #5e6d82"
+                       :node-draggable="false"
+                       @on-contextmenu="onMenus"
+                       @on-expand="onExpand"
+                       @on-node-focus="onNodeFocus"
+                       @on-node-dblclick="onNodeDblclick"
         >
         </vue3-tree-org>
         <el-button type="primary" :icon="Edit" style="float: right;margin-right: 10px;padding: 8px" @click="updateOrg"/>
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { getCurrentInstance, onMounted, ref } from 'vue';
+import {getCurrentInstance, onMounted, reactive, ref, watch} from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 export default {
 
@@ -43,9 +43,72 @@ export default {
   setup() {
     const { proxy } = getCurrentInstance();
     const organization = ref([]);
+    const tempOrganization = ref([]);
     const activeTabName = ref('');
     // 从localStorage初始化tabCounter，如果没有则设为0
-    let tabCounter = ref(parseInt(localStorage.getItem('tabCounter')) || 0);
+    let tabCounter = ref(parseInt(localStorage.getItem('tabCounter')) || 0 );
+    // 公司信息（主界面数据）
+    const company = reactive({
+      name: '',
+      location: '',
+      type: '',
+      established_date: '',
+      phone: '',
+      email: '',
+      ceo_name: '',
+      web: '',
+      c_username: '',
+      c_password: '',
+      introduction: '',
+    });
+    const companyOrg = ref([]);
+
+    // 创建公司根节点结构
+    const createCompanyRoot = () => {
+      return {
+        name: 'company_root',
+        label: company.name || '公司根节点',
+        expand: true,
+        children: organization
+      };
+    };
+
+    // 合并公司信息和组织结构
+    const mergeOrganization = () => {
+      if (company.name) {
+        const companyRoot = createCompanyRoot();
+        tempOrganization.value = [companyRoot, ...organization.value];
+        activeTabName.value = tempOrganization.value[0]?.name || '';
+      } else {
+        tempOrganization.value = [...organization.value];
+      }
+    };
+
+    // 监听company和organization的变化
+    watch([() => company.name, organization], () => {
+      mergeOrganization();
+    }, { deep: true });
+
+    // 加载公司信息
+    const loadCompanyInfo = async () => {
+      try {
+        const c_username = localStorage.getItem('c_username');
+        if (!c_username) {
+          new proxy.$tips('未找到账户信息', 'error').message_();
+          return;
+        }
+        const res = await new proxy.$request(proxy.$urls.m().loadCompany + '?c_username=' + c_username).modeget();
+        console.log(res);
+        if (res && res.data) {
+          Object.assign(company, res.data); // 将后端数据赋值给 company
+        } else {
+          new proxy.$tips('获取公司信息失败', 'error').message_();
+        }
+      } catch (error) {
+        console.error(error);
+        new proxy.$tips('服务器发生错误', 'error').message_();
+      }
+    };
 
     async function organizationTree() {
       try {
@@ -72,7 +135,7 @@ export default {
               expand: true
             }));
 
-            activeTabName.value = organization.value[0]?.name || '';
+            mergeOrganization();
           }
         }else{
           // 对于已有数据，同样计算最大编号
@@ -85,10 +148,8 @@ export default {
           localStorage.setItem('tabCounter', maxTabNumber.toString());
 
           organization.value = res1.data;
-          activeTabName.value = organization.value[0]?.name || '';
-
+          mergeOrganization();
         }
-
       } catch (error) {
         console.error(error);
         new proxy.$tips('服务器发生错误', 'error').message_();
@@ -106,16 +167,22 @@ export default {
           name: newTabName,
           label: `New Tab ${newTabName}`,
           expand: true
-
         });
+        mergeOrganization();
         activeTabName.value = newTabName;
       } else if (action === 'remove') {
-        if (organization.value.length <= 1) {
+        if (tempOrganization.value.length <= 1) {
           new proxy.$tips('至少保留一个标签页', 'warning').message_();
           return;
         }
 
-        const tabs = organization.value;
+        // 如果是删除公司根节点，不允许
+        if (targetName === 'company_root') {
+          new proxy.$tips('不能删除公司根节点', 'warning').message_();
+          return;
+        }
+
+        const tabs = tempOrganization.value;
         let newActiveName = activeTabName.value;
 
         if (newActiveName === targetName) {
@@ -126,10 +193,13 @@ export default {
           }
         }
 
-        organization.value = tabs.filter(tab => tab.name !== targetName);
+        // 从organization中删除对应的tab
+        organization.value = organization.value.filter(tab => tab.name !== targetName);
+        mergeOrganization();
         activeTabName.value = newActiveName;
       }
     };
+
     //修改组织结构
     const updateOrg = async () => {
       try {
@@ -138,13 +208,13 @@ export default {
         // 方法2：作为表单数据发送（推荐）
         const formData = new FormData();
         formData.append('c_username', c_username);
+        // 保存时只保存organization部分，不保存公司根节点
         formData.append('c_org', JSON.stringify(organization.value));
         const res = await new proxy.$request(proxy.$urls.m().updateC_org, formData).modepost();
         console.log(res);
         if (res.data == 1) {
           new proxy.$tips('修改成功', 'success').message_();
           await organizationTree();
-
         } else {
           new proxy.$tips('修改失败', 'error').message_();
         }
@@ -153,27 +223,37 @@ export default {
         new proxy.$tips('服务器发生错误', 'error').message_();
       }
     };
+
     // 初始化或获取数据
     onMounted(() => {
       organizationTree();
+      loadCompanyInfo();
     });
+
     return {
       organization,
+      tempOrganization,
       activeTabName,
       handleTabsEdit,
       Edit,
-      updateOrg
+      updateOrg,
+      company
     };
   },
   methods: {
-    onMenus({node, command}) {
-      console.log(node, command);
-
+    onMenus({command, node}) {
     },
     onExpand(e, data) {
       console.log(e, data);
     },
-    onNodeDblclick() {
+    onNodeFocus(e,data){
+      console.log("焦点");
+      console.log(data);
+      data.expand = true;
+      console.log(data);
+    },
+    onNodeDblclick(e, data) {
+      data.expand = true;
       console.log('onNodeDblclick');
     },
   }

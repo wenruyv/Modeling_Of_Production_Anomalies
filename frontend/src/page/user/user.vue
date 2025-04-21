@@ -32,7 +32,7 @@ export default{
     const {proxy} = getCurrentInstance()
     //请求数据
     onMounted(()=>{
-      suserlist()
+      userlist()
     })
 
     const user_data = reactive({
@@ -47,7 +47,7 @@ export default{
       const end = start + user_data.pageSize;
       return user_data.user_array.slice(start, end);
     });
-    async function suserlist(){
+    async function userlist(){
       try {
         const res = await new proxy.$request(proxy.$urls.m().user).modeget()
         console.log(res)

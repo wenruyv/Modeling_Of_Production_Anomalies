@@ -9,10 +9,13 @@ public class Staff {
     private String phone;
     private String email;
     private String position;//职位
+    private int dep_id;
     private String department;//部门
     private String hire_date;//入职日期
     private String group1;//所属小组
     private String group_leader;//组长
+    private int com_id;
+    private String com_name;//部门
 
     public int getId() {
         return id;
@@ -110,6 +113,30 @@ public class Staff {
         this.group_leader = group_leader;
     }
 
+    public int getDep_id() {
+        return dep_id;
+    }
+
+    public void setDep_id(int dep_id) {
+        this.dep_id = dep_id;
+    }
+
+    public int getCom_id() {
+        return com_id;
+    }
+
+    public void setCom_id(int com_id) {
+        this.com_id = com_id;
+    }
+
+    public String getCom_name() {
+        return com_name;
+    }
+
+    public void setCom_name(String com_name) {
+        this.com_name = com_name;
+    }
+
     @Override
     public String toString() {
         return "Staff{" +
@@ -121,10 +148,13 @@ public class Staff {
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", position='" + position + '\'' +
+                ", dep_id=" + dep_id +
                 ", department='" + department + '\'' +
                 ", hire_date='" + hire_date + '\'' +
-                ", group='" + group1 + '\'' +
+                ", group1='" + group1 + '\'' +
                 ", group_leader='" + group_leader + '\'' +
+                ", com_id=" + com_id +
+                ", com_name='" + com_name + '\'' +
                 '}';
     }
 }

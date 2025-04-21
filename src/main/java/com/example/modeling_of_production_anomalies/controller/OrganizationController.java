@@ -67,7 +67,7 @@ public class OrganizationController {
         cuser.setPassword(company.getC_password());
         cuser.setUser_type(2);
         // 添加Cuser到数据库
-        int newCuser = userService.addCuser(cuser);
+        int newCuser = userService.addUser(cuser);
 
         // 输出调试信息
         System.out.println("公司添加结果: " + newCom);

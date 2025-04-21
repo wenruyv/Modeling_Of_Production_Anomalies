@@ -18,6 +18,11 @@ const routes = [
                 component: () => import('@/page/user/user.vue')
             },
             {
+                path: '/user1', //
+                name: 'user1',
+                component: () => import('@/page/user/user1.vue')
+            },
+            {
                 path: '/companyList', //
                 name: 'companyList',
                 component: () => import('@/page/organization/companyList.vue')
@@ -91,6 +96,29 @@ const routes = [
                 component: () => import('@/page/comPage/comStaff.vue')
             },
 
+        ]
+    },
+    {   //部门index
+        path: '/depIndex',
+        name: 'depIndex',
+        component: () => import('@/page/depPage/depIndex.vue'),
+        redirect: '/index1', // 修改为绝对路径
+        children: [
+            {
+                path: '/index1', //首页
+                name: 'index1',
+                component: () => import('@/page/depPage/index1.vue')
+            },
+            {
+                path: '/depInfo', //企业信息
+                name: 'depInfo',
+                component: () => import('@/page/depPage/depInfo.vue')
+            },
+            {
+                path: '/depStaff', //企业组织结构图
+                name: 'depStaff',
+                component: () => import('@/page/depPage/depStaff.vue')
+            },
         ]
     }
 ];

@@ -5,16 +5,36 @@
 <mapper namespace="com.example.modeling_of_production_anomalies.mapper.DepartmentMapper">
     <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.Department">
         <id column="id" jdbcType="INTEGER" property="id"/>
-        <result column="department" jdbcType="LONGVARCHAR" property="department"/>
-        <result column="d_username" jdbcType="LONGVARCHAR" property="d_username"/>
-        <result column="d_password" jdbcType="LONGVARCHAR" property="d_password"/>
+        <result column="department" jdbcType="VARCHAR" property="department"/>
+        <result column="d_username" jdbcType="VARCHAR" property="d_username"/>
+        <result column="d_password" jdbcType="VARCHAR" property="d_password"/>
+        <result column="d_name" jdbcType="VARCHAR" property="d_name"/>
+        <result column="location" jdbcType="VARCHAR" property="location"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="com_id" jdbcType="INTEGER" property="com_id"/>
+        <result column="com_name" jdbcType="VARCHAR" property="com_name"/>
 
     </resultMap>
     <select id="depList" resultMap="BaseResultMap">
-        select * from department
+        select * from department where com_id = #{com_id}
     </select>
     <insert id="addDepartment">
-        insert into department (id,department,d_username,d_password)
-        values (#{id},#{department},#{d_username},#{d_password})
+        insert into department (id,department,d_username,d_password,d_name,location,description,com_id,com_name)
+        values (#{id},#{department},#{d_username},#{d_password},#{d_name},#{location},#{description},#{com_id},#{com_name})
     </insert>
+    <select id="selectByD_username" resultMap="BaseResultMap">
+        select * from department where d_username = #{d_username}
+    </select>
+    <update id="updateDep">
+        UPDATE department
+        SET department = #{department},
+            d_username = #{d_username},
+            d_password = #{d_password},
+            d_name = #{d_name},
+            location = #{location},
+            description = #{description},
+            com_id = #{com_id},
+            com_name = #{com_name}
+            WHERE id = #{id}
+    </update>
 </mapper>
