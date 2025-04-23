@@ -103,6 +103,19 @@ public class OrganizationController {
     public String isEmptyOrg(@RequestParam String c_username) {
         String result = organizationService.isEmptyOrg(c_username);
         return result;
+    }
+    @GetMapping("/orgById")
+    public String OrgById(@RequestParam int id) {
+        String result = organizationService.orgById(id);
+        return result;
+    }
+    @DeleteMapping("/delete/{id}")
+    public int deleteById(@PathVariable int id){
+        Company company = organizationService.findById(id);
+        User user = userService.findByUsername(company.getC_username());
+        int result = userService.deleteUserById(user.getUser_id());
+        if(result == 1) return organizationService.deleteById(id);
+        else return 0;
 
     }
 }

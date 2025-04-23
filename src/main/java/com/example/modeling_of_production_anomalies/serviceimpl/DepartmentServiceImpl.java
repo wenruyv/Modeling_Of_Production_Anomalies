@@ -28,7 +28,17 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    public Department selectDepById(int id) {
+        return departmentMapper.selectDepById(id);
+    }
+
+    @Override
     public int updateDep(Department department) {
         return departmentMapper.updateDep(department);
+    }
+
+    @Override
+    public int deleteDepById(int id) {
+        return departmentMapper.deleteDepById(id);
     }
 }

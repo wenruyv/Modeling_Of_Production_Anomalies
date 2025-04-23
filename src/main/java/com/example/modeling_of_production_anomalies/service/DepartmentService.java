@@ -8,5 +8,8 @@ public interface DepartmentService {
     List<Department> depList(int com_id);
     int addDepartment(Department department);
     Department selectByD_username(String d_username);
+    Department selectDepById(int id);
     int updateDep(Department department);
+    int deleteDepById(int id);
+
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="heading">公司信息</div>
     <div>
-      <el-card class="box-card" style="width: 100%">
+      <el-card class="box-card" style="width: 100%;" :body-style="{ padding: '20px' }">
       <el-form :model="company" label-width="120px" style="padding-right: 10px">
         <el-row style="padding-top: 10px">
           <el-col :span="12">
@@ -298,6 +298,4 @@ export default {
 </script>
 
 <style>
-/* 只读输入框样式 */
-
 </style>

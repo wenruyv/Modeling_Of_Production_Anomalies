@@ -82,3 +82,92 @@
 	scrollbar-width: none; /* Firefox */
 	-ms-overflow-style: none; /* IE/Edge */
 }
+/* 容器样式优化 */
+.container {
+	max-width: 1400px;
+	margin: 20px auto;
+	padding: 24px;
+	background: #f5f7fa;
+	min-height: calc(100vh - 40px);
+}
+
+/* 操作按钮区域优化 */
+.operation-area {
+	margin-bottom: 16px;
+	display: flex;
+	gap: 12px;
+}
+
+/* 表格容器优化 */
+.table-container {
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+	overflow: hidden;
+}
+
+/* 表格样式优化 */
+:deep(.el-table) {
+	font-size: 14px;
+}
+th {
+	background-color: #f8f9fa!important;
+	color: #606266;
+	font-weight: 600;
+}
+
+td {
+	color: #606266;
+}
+
+.cell {
+	padding: 8px 12px;
+	line-height: 1.6;
+}
+
+/* 可滚动单元格优化 */
+.scrollable-cell {
+	max-width: 200px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	display: block;
+	padding: 8px 12px;
+	line-height: 1.6;
+}
+
+/* 分页优化 */
+.el-pagination {
+	padding: 16px 0;
+	background: white;
+	margin-top: 0!important;
+	border-top: 1px solid #ebeef5;
+}
+
+
+:deep(.el-form-item__label) {
+	font-weight: 500;
+	color: #606266;
+}
+
+/* 按钮样式优化 */
+.el-button {
+	transition: all 0.3s;
+}--small {
+	 padding: 7px 12px;
+ }
+
+/* 卡片样式优化 */
+.box-card {
+	border: none !important;
+}
+.el-card__body{
+	padding: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+	.container {
+		padding: 16px;
+	}
+}

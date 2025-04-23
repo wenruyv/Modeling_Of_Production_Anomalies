@@ -1,20 +1,33 @@
 <template>
-    <div class="heading">部门信息
-      <el-button type="primary"
-                 @click="dialogFormVisible = true"
-                 size="large"
-                 style="width: 140px;float: right;">添加部门管理员</el-button>
-    </div>
-    <div>
+  <div class="container">
+    <!-- 操作按钮 -->
+    <div style="margin-bottom: 10px;">
+      <div class="heading">部门管理
+        <el-button @click="dialogFormVisible = true" type="primary" style="width: 80px;float: right;" >新增</el-button></div>
 
-      <el-card class="box-card" style="width: 100%">
+    </div>
+
+    <div class="table-container">
+      <el-card class="box-card" >
       <el-table :data="paginatedData" stripe style="width: 100%">
         <!--        <el-table-column prop="id" label="id" min-width="100" />-->
-        <el-table-column prop="department" label="部门" min-width="100" />
+        <el-table-column prop="department" label="部门" min-width="100">
+          <template #default="scope">
+            <div class="scrollable-cell" :title="scope.row.department">{{ scope.row.department }}</div>
+          </template>
+        </el-table-column>
         <el-table-column prop="d_name" label="负责人姓名" min-width="100" />
         <el-table-column prop="d_username" label="管理员账号" min-width="100"/>
         <el-table-column prop="d_password" label="管理员密码" min-width="100"/>
         <el-table-column prop="location" label="办公地点" min-width="100"/>
+        <el-table-column prop="description" label="部门介绍" min-width="100"/>
+        <!-- 操作列 -->
+        <el-table-column label="操作" min-width="120">
+          <template #default="scope">
+            <el-button size="small" @click="openEditDialog(scope.row)">修改</el-button>
+            <el-button size="small" type="danger" @click="deleteRow(scope.row.id)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 弹窗添加部门-->
@@ -75,6 +88,56 @@
           </span>
         </template>
       </el-dialog>
+        <!-- 修改对话框 -->
+        <el-dialog v-model="editDialogVisible" title="修改记录">
+          <el-form :model="editRecord" label-width="120px">
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="部门" prop="department">
+                  <el-input v-model="editRecord.department" disabled/>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="负责人姓名" prop="d_name">
+                  <el-input v-model="editRecord.d_name" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="管理员账号" prop="d_username">
+                  <el-input v-model="editRecord.d_username" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="管理员密码" prop="d_password">
+                  <el-input v-model="editRecord.d_password" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="办公地点" prop="location">
+                  <el-input v-model="editRecord.location" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="所属公司" prop="com_name">
+                  <el-input v-model="editRecord.com_name" disabled/>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-form-item label="部门介绍" prop="description">
+              <el-input v-model="editRecord.description" type="textarea" />
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="editDialogVisible = false">取消</el-button>
+              <el-button type="primary" @click="updateRow">确定</el-button>
+            </span>
+          </template>
+        </el-dialog>
       <el-pagination
           background
           layout="prev, pager, next"
@@ -86,12 +149,15 @@
       />
       </el-card>
     </div>
-
+  </div>
 </template>
 
 <script>
 import {reactive, onMounted, getCurrentInstance, toRefs, computed, ref} from 'vue';
+import {ElButton, ElDialog, ElForm, ElFormItem, ElInput} from "element-plus";
+import axios from 'axios';
 export default{
+  components: {ElFormItem, ElForm, ElInput, ElDialog, ElButton},
   setup(){
     const {proxy} = getCurrentInstance()
     //请求数据
@@ -105,6 +171,7 @@ export default{
     const value = ref()
     const organization = ref([]);
     const depart = reactive({
+      id:'',
       department: '',
       d_username: '',
       d_password: '',
@@ -120,6 +187,7 @@ export default{
       children: 'children' // 子节点字段名
     };
     const resetForm = () => {
+      depart.id = '',
       depart.department = '';
       depart.d_username = '';
       depart.d_password = '';
@@ -129,7 +197,36 @@ export default{
       depart.location = '';
       depart.description = '';
     };
+// 修改对话框相关
+    const editDialogVisible = ref(false);
+    const editRecord = reactive({
+      id:'',
+      department: '',
+      d_username: '',
+      d_password: '',
+      com_id:'',
+      com_name:'',
+      d_name:'',
+      location:'',
+      description:'',
+    });
+    // 打开修改对话框
+    const openEditDialog = (row) => {
+      editDialogVisible.value = true;
+      Object.assign(editRecord, row);
+    };
 
+// 修改记录
+    const updateRow = async () => {
+      try {
+        await axios.post('api/depart/updateDep', editRecord);
+        editDialogVisible.value = false;
+        new proxy.$tips('修改成功', 'success').message_();
+        depList(); // 刷新数据
+      } catch (error) {
+        console.error('修改记录失败', error);
+      }
+    };
 // 在弹窗关闭时调用
     const handleDialogClose = () => {
       dialogFormVisible.value = false;
@@ -170,6 +267,7 @@ export default{
       department: [{ required: true, message: '请选择部门', trigger: 'change' }],
       d_username: [{ required: true, message: '部门管理员账号不能为空', trigger: 'blur' }],
       d_password: [{ required: true, message: '部门管理员密码不能为空', trigger: 'blur' }],
+      d_name: [{ required: true, message: '负责人姓名不能为空', trigger: 'blur' }],
     }
     const depart_data = reactive({
       depart_array: [],//数据
@@ -213,10 +311,37 @@ export default{
     //添加新数据
     const insertDep = async () => {
       try {
+        const valid = await proxy.$refs.depForm.validate();
+        console.log("表单验证结果" + valid);
+        if (!valid) {
+          return;  // 如果验证失败，直接返回
+        }
         const res = await new proxy.$request(proxy.$urls.m().addDepartment, depart).modepost();
         console.log(res);
         if (res.data == 1) {
           new proxy.$tips('添加成功', 'success').message_();
+          // 更新组织结构中的部门信息
+          const updateNode = (nodes) => {
+            return nodes.map(node => {
+              if (node.label === depart.department) {
+                return {
+                  ...node,
+                  d_name: depart.d_name,
+                  location: depart.location,
+                  description: depart.description
+                };
+              }
+              if (node.children) {
+                return {
+                  ...node,
+                  children: updateNode(node.children)
+                };
+              }
+              return node;
+            });
+          };
+
+          organization.value = updateNode(organization.value);
           handleDialogClose(); // 关闭弹窗
           await depList(); // 刷新页面内容
         } else {
@@ -226,12 +351,24 @@ export default{
         console.error(e);
       }
     }
+// 删除记录
+    const deleteRow = async (id) => {
+      try {
+        if (confirm('确定要删除这条记录吗？')) {
+          await axios.delete(`api/depart/delete/${id}`);
+          new proxy.$tips('删除成功', 'success').message_();
+          await depList();
+        }
 
+      } catch (error) {
+        new proxy.$tips('删除失败', 'error').message_();
+      }
+    };
     // 分页触发事件
     function currentchange(e) {
       depart_data.page = e; // 更新页码
     }
-    return {...toRefs(depart_data),
+    return {...toRefs(depart_data),openEditDialog,updateRow,editDialogVisible,editRecord,
       paginatedData,
       currentchange,
       dialogFormVisible,
@@ -243,12 +380,104 @@ export default{
       organization,
       orgTree,
       treeProps,
-      handleDialogClose
+      handleDialogClose,deleteRow
     }
   }
 
 }
 </script>
 
-<style>
+<style scoped>
+/* 容器样式优化 */
+.container {
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 24px;
+  background: #f5f7fa;
+  min-height: calc(100vh - 40px);
+}
+
+/* 操作按钮区域优化 */
+.operation-area {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+/* 表格容器优化 */
+.table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+  overflow: hidden;
+}
+
+/* 表格样式优化 */
+:deep(.el-table) {
+  font-size: 14px;
+}
+th {
+  background-color: #f8f9fa!important;
+  color: #606266;
+  font-weight: 600;
+}
+
+td {
+  color: #606266;
+}
+
+.cell {
+  padding: 8px 12px;
+  line-height: 1.6;
+}
+
+/* 可滚动单元格优化 */
+.scrollable-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  padding: 8px 12px;
+  line-height: 1.6;
+}
+
+/* 分页优化 */
+.el-pagination {
+  padding: 16px 0;
+  background: white;
+  margin-top: 0!important;
+  border-top: 1px solid #ebeef5;
+}
+
+
+:deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #606266;
+}
+
+/* 按钮样式优化 */
+.el-button {
+  transition: all 0.3s;
+}
+&--small {
+  padding: 7px 12px;
+}
+
+/* 卡片样式优化 */
+.box-card {
+  border: none !important;
+}
+:deep(.el-card__body) {
+  padding: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .container {
+    padding: 16px;
+  }
+
+
+}
 </style>

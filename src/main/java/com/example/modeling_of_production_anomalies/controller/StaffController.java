@@ -15,13 +15,26 @@ public class StaffController {
     @Autowired
     private StaffService staffService;
     @RequestMapping("/list")
-    public List<Staff> getStaffList(){
-        List<Staff> list = staffService.staffList();
+    public List<Staff> getStaffList(@RequestParam int com_id){
+        List<Staff> list = staffService.staffList(com_id);
+        return list;
+    }
+    @RequestMapping("/depList")
+    public List<Staff> getDepStaffList(@RequestParam int dep_id){
+        List<Staff> list = staffService.depStaffList(dep_id);
         return list;
     }
     @PostMapping("/addStaff")
     public int addStaff(@RequestBody Staff staff){
         int newStaff = staffService.addStaff(staff);
         return newStaff;
+    }
+    @PostMapping("/update")
+    public int updateStaff(@RequestBody Staff staff){
+        return staffService.updateStaff(staff);
+    }
+    @DeleteMapping("/delete/{id}")
+    public int deleteById(@PathVariable int id){
+        return staffService.deleteById(id);
     }
 }

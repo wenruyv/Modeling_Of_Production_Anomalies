@@ -8,6 +8,7 @@ import java.util.List;
 public interface OrganizationService {
     int addCompany(Company company);
     Company selectByC_username(String c_username);
+    Company findById(int id);
     int updateCompany(Company company);
     List<Organization> getOrgTree();
     List<Company> companyList();
@@ -16,4 +17,6 @@ public interface OrganizationService {
     int deleteNode(Organization id);
     int updateC_org(String c_username,String c_org);
     String isEmptyOrg(String c_username);
+    String orgById(int id);
+    int deleteById(int id);
 }

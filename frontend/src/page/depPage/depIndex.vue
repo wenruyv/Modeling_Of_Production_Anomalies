@@ -95,6 +95,13 @@ export default {
       {
         id: '3',
         icon: OfficeBuilding,
+        title: '部门结构',
+        router: 'depOrg',
+        Subclass: [], // 是否有二级菜单
+      },
+      {
+        id: '4',
+        icon: OfficeBuilding,
         title: '员工信息',
         router: 'depStaff',
         Subclass: [], // 是否有二级菜单

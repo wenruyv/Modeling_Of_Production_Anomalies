@@ -18,11 +18,6 @@ const routes = [
                 component: () => import('@/page/user/user.vue')
             },
             {
-                path: '/user1', //
-                name: 'user1',
-                component: () => import('@/page/user/user1.vue')
-            },
-            {
                 path: '/companyList', //
                 name: 'companyList',
                 component: () => import('@/page/organization/companyList.vue')
@@ -31,11 +26,6 @@ const routes = [
                 path: '/org', //树状图？？？
                 name: 'org',
                 component: () => import('@/page/organization/org.vue')
-            },
-            {
-                path: '/addCompany', //
-                name: 'addCompany',
-                component: () => import('@/page/organization/addCompany.vue')
             },
             {
                 path: '/resource', //
@@ -86,6 +76,11 @@ const routes = [
                 component: () => import('@/page/comPage/comOrganization.vue')
             },
             {
+                path: '/comInformation', //企业组织结构图
+                name: 'comInformation',
+                component: () => import('@/page/comPage/comProInfo.vue')
+            },
+            {
                 path: '/departmentList', //部门列表
                 name: 'departmentList',
                 component: () => import('@/page/comPage/departmentInfo.vue')
@@ -110,12 +105,17 @@ const routes = [
                 component: () => import('@/page/depPage/index1.vue')
             },
             {
-                path: '/depInfo', //企业信息
+                path: '/depInfo', //部门信息
                 name: 'depInfo',
                 component: () => import('@/page/depPage/depInfo.vue')
             },
             {
-                path: '/depStaff', //企业组织结构图
+                path: '/depOrg', //部门信息
+                name: 'depOrg',
+                component: () => import('@/page/depPage/depOrg.vue')
+            },
+            {
+                path: '/depStaff', //部门员工
                 name: 'depStaff',
                 component: () => import('@/page/depPage/depStaff.vue')
             },

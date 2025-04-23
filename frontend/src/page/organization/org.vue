@@ -1,6 +1,5 @@
 <template>
   <div class="heading">生产组织结构图</div>
-  <div>{{tabs}}</div>
   <div>
     <el-tabs type="border-card">
       <el-tab-pane

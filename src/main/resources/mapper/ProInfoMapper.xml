@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.ProInfoMapper">
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.ProInfo">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="LONGVARCHAR" property="name"/>
+        <result column="c_id" jdbcType="INTEGER" property="c_id"/>
+        <result column="c_name" jdbcType="LONGVARCHAR" property="c_name"/>
+        <result column="info" jdbcType="LONGVARCHAR" property="info"/>
+    </resultMap>
+
+    <select id="findInfoByC_id" resultMap="BaseResultMap">
+        select * from pro_info where c_id =#{c_id}
+    </select>
+    <select id="proInfoList" resultMap="BaseResultMap">
+        select * from pro_info
+    </select>
+    <update id="updateProInfo">
+        update pro_info
+        set name = #{name},
+            c_id = #{c_id},
+            c_name = #{c_name},
+            info = #{info}
+        where id = #{id}
+    </update>
+    <insert id="addProInfo">
+        insert into pro_info (name,c_id,c_name,info) values (#{name},#{c_id},#{c_name},#{info})
+    </insert>
+</mapper>

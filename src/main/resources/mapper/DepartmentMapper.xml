@@ -25,6 +25,9 @@
     <select id="selectByD_username" resultMap="BaseResultMap">
         select * from department where d_username = #{d_username}
     </select>
+    <select id="selectDepById" resultMap="BaseResultMap">
+        select * from department where id = #{id}
+    </select>
     <update id="updateDep">
         UPDATE department
         SET department = #{department},
@@ -37,4 +40,7 @@
             com_name = #{com_name}
             WHERE id = #{id}
     </update>
+    <delete id="deleteDepById">
+        delete from department where id = #{id}
+    </delete>
 </mapper>

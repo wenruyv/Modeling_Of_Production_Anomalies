@@ -26,6 +26,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     public int updateC_org(String c_username,String c_org){
         return companyMapper.updateC_org(c_username,c_org);
     }
+
+    @Override
+    public String orgById(int id) {
+        return companyMapper.orgById(id);
+    }
+
     @Override
     public List<Organization> getOrgTree() {
         List<Organization> allNodes = organizationMapper.orgList(); // 获取所有节点
@@ -89,6 +95,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public Company findById(int id) {
+        return companyMapper.findById(id);
+    }
+
+    @Override
     public int updateCompany(Company company) {
         // 根据公司ID或其他唯一标识更新公司信息
         return companyMapper.updateCompany(company);
@@ -97,5 +108,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public List<Company> companyList() {
         return companyMapper.companyList();
+    }
+
+    @Override
+    public int deleteById(int id) {
+        return companyMapper.deleteById(id);
     }
 }

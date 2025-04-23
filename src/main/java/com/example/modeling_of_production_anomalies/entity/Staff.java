@@ -113,14 +113,6 @@ public class Staff {
         this.group_leader = group_leader;
     }
 
-    public int getDep_id() {
-        return dep_id;
-    }
-
-    public void setDep_id(int dep_id) {
-        this.dep_id = dep_id;
-    }
-
     public int getCom_id() {
         return com_id;
     }
@@ -135,6 +127,14 @@ public class Staff {
 
     public void setCom_name(String com_name) {
         this.com_name = com_name;
+    }
+
+    public int getDep_id() {
+        return dep_id;
+    }
+
+    public void setDep_id(int dep_id) {
+        this.dep_id = dep_id;
     }
 
     @Override

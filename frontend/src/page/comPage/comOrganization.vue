@@ -31,6 +31,21 @@
         <el-button type="primary" :icon="Edit" style="float: right;margin-right: 10px;padding: 8px" @click="updateOrg"/>
       </el-tab-pane>
     </el-tabs>
+
+    <!-- 部门详情弹窗 -->
+    <el-dialog v-model="detailDialogVisible" title="部门详情" width="30%">
+      <el-descriptions :column="1" border>
+        <el-descriptions-item label="部门名称">{{ currentNode.label }}</el-descriptions-item>
+        <el-descriptions-item label="负责人">{{ currentNode.d_name || '无' }}</el-descriptions-item>
+        <el-descriptions-item label="办公地点">{{ currentNode.location || '无' }}</el-descriptions-item>
+        <el-descriptions-item label="部门描述">{{ currentNode.description || '无' }}</el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="detailDialogVisible = false">关闭</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -38,16 +53,15 @@
 import {getCurrentInstance, onMounted, reactive, ref, watch} from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 export default {
-
   name: "BaseTree",
   setup() {
     const { proxy } = getCurrentInstance();
     const organization = ref([]);
     const tempOrganization = ref([]);
     const activeTabName = ref('');
-    // 从localStorage初始化tabCounter，如果没有则设为0
     let tabCounter = ref(parseInt(localStorage.getItem('tabCounter')) || 0 );
-    // 公司信息（主界面数据）
+
+    // 公司信息
     const company = reactive({
       name: '',
       location: '',
@@ -61,7 +75,10 @@ export default {
       c_password: '',
       introduction: '',
     });
-    const companyOrg = ref([]);
+
+    // 详情弹窗相关
+    const detailDialogVisible = ref(false);
+    const currentNode = ref({});
 
     // 创建公司根节点结构
     const createCompanyRoot = () => {
@@ -100,7 +117,7 @@ export default {
         const res = await new proxy.$request(proxy.$urls.m().loadCompany + '?c_username=' + c_username).modeget();
         console.log(res);
         if (res && res.data) {
-          Object.assign(company, res.data); // 将后端数据赋值给 company
+          Object.assign(company, res.data);
         } else {
           new proxy.$tips('获取公司信息失败', 'error').message_();
         }
@@ -113,54 +130,64 @@ export default {
     async function organizationTree() {
       try {
         const c_username = localStorage.getItem('c_username');
-        const res1 = await new proxy.$request(proxy.$urls.m().isEmptyOrg  + '?c_username=' + c_username).modeget();
-        console.log(res1);
-        if(res1.data == "" || res1.data == null){
-          console.log("res1是空的");
+        const res1 = await new proxy.$request(proxy.$urls.m().loadCompany + '?c_username=' + c_username).modeget();
+        const com_id = res1.data.id;
+
+        const [orgRes, depRes] = await Promise.all([
+          new proxy.$request(proxy.$urls.m().isEmptyOrg + '?c_username=' + c_username).modeget(),
+          new proxy.$request(proxy.$urls.m().departmentList + '?com_id=' + com_id).modeget()
+        ]);
+
+        // 处理组织树数据，将顶级节点作为独立标签页
+        const processOrgData = (data) => {
+          if (!Array.isArray(data)) return [data];
+
+          // 合并部门信息
+          const mergeDepartmentInfo = (nodes, departments) => {
+            return nodes.map(node => {
+              const depInfo = departments.find(dep => dep.department === node.label);
+              const newNode = {
+                ...node,
+                id: node.id, // 使用原有ID
+                name: node.label, // 使用label作为标签页名称
+                d_name: depInfo?.d_name,
+                location: depInfo?.location,
+                description: depInfo?.description,
+                expand: true
+              };
+              if (node.children) {
+                newNode.children = mergeDepartmentInfo(node.children, departments);
+              }
+              return newNode;
+            });
+          };
+
+          const departments = depRes.data || [];
+          return mergeDepartmentInfo(data, departments);
+        };
+
+        if (orgRes.data && Array.isArray(orgRes.data)) {
+          organization.value = processOrgData(orgRes.data);
+        } else {
           const res = await new proxy.$request(proxy.$urls.m().orgTree).modeget();
-          if (res?.data && Array.isArray(res.data)) {
-            // 计算现有标签中的最大编号
-            const maxTabNumber = res.data.reduce((max, item) => {
-              const num = parseInt(item.name);
-              return isNaN(num) ? max : Math.max(max, num);
-            }, 0);
-
-            // 更新tabCounter为最大编号
-            tabCounter.value = maxTabNumber;
-            localStorage.setItem('tabCounter', maxTabNumber.toString());
-
-            organization.value = res.data.map(item => ({
-              ...item,
-              name: item.name || `${++tabCounter.value}`, // 保留原有名称或生成新编号
-              expand: true
-            }));
-
-            mergeOrganization();
-          }
-        }else{
-          // 对于已有数据，同样计算最大编号
-          const maxTabNumber = res1.data.reduce((max, item) => {
-            const num = parseInt(item.name);
-            return isNaN(num) ? max : Math.max(max, num);
-          }, 0);
-
-          tabCounter.value = maxTabNumber;
-          localStorage.setItem('tabCounter', maxTabNumber.toString());
-
-          organization.value = res1.data;
-          mergeOrganization();
+          organization.value = processOrgData(res.data);
         }
+
+        // 设置第一个标签页为活动状态
+        if (organization.value.length > 0) {
+          activeTabName.value = organization.value[0].id;
+        }
+
+        mergeOrganization();
       } catch (error) {
         console.error(error);
         new proxy.$tips('服务器发生错误', 'error').message_();
       }
     }
-
-    // 处理标签页的添加/删除
+// 修改 handleTabsEdit 函数
     const handleTabsEdit = (targetName, action) => {
       if (action === 'add') {
-        // 增加标签时更新计数器并存储
-        tabCounter.value += 1;  // 使用.value访问ref的值
+        tabCounter.value += 1;
         localStorage.setItem('tabCounter', tabCounter.value.toString());
         const newTabName = `${tabCounter.value}`;
         organization.value.push({
@@ -176,7 +203,6 @@ export default {
           return;
         }
 
-        // 如果是删除公司根节点，不允许
         if (targetName === 'company_root') {
           new proxy.$tips('不能删除公司根节点', 'warning').message_();
           return;
@@ -193,22 +219,19 @@ export default {
           }
         }
 
-        // 从organization中删除对应的tab
+        // 修改这里：同时从 organization 和 tempOrganization 中删除
         organization.value = organization.value.filter(tab => tab.name !== targetName);
-        mergeOrganization();
+        tempOrganization.value = tempOrganization.value.filter(tab => tab.name !== targetName);
+
         activeTabName.value = newActiveName;
       }
     };
-
     //修改组织结构
     const updateOrg = async () => {
       try {
-        // 发送修改请求
         const c_username = localStorage.getItem('c_username');
-        // 方法2：作为表单数据发送（推荐）
         const formData = new FormData();
         formData.append('c_username', c_username);
-        // 保存时只保存organization部分，不保存公司根节点
         formData.append('c_org', JSON.stringify(organization.value));
         const res = await new proxy.$request(proxy.$urls.m().updateC_org, formData).modepost();
         console.log(res);
@@ -237,7 +260,9 @@ export default {
       handleTabsEdit,
       Edit,
       updateOrg,
-      company
+      company,
+      detailDialogVisible,
+      currentNode
     };
   },
   methods: {
@@ -253,8 +278,19 @@ export default {
       console.log(data);
     },
     onNodeDblclick(e, data) {
-      data.expand = true;
-      console.log('onNodeDblclick');
+      // 检查是否是公司根节点的直接子节点（一级部门）
+      const isFirstLevelNode = this.tempOrganization.some(tab =>
+          tab.children && tab.children.some(child => child === data)
+      );
+
+      if (isFirstLevelNode) {
+        this.currentNode = data;
+        this.detailDialogVisible = true;
+        console.log("双击");
+      } else {
+        // 非一级节点，可以添加其他处理或什么都不做
+        console.log('双击的不是一级部门节点');
+      }
     },
   }
 };
@@ -263,5 +299,15 @@ export default {
 <style>
 .el-tabs__new-tab {
   margin-right: 10px;
+}
+.node-label {
+  display: flex;
+  align-items: center;
+}
+
+.manager-name {
+  margin-left: 5px;
+  color: #67C23A;
+  font-size: 0.9em;
 }
 </style>

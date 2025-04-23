@@ -12,20 +12,39 @@
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="position" jdbcType="VARCHAR" property="position"/>
-        <id column="dep_id" jdbcType="INTEGER" property="dep_id"/>
+        <result column="dep_id" jdbcType="INTEGER" property="dep_id"/>
         <result column="department" jdbcType="VARCHAR" property="department"/>
         <result column="hire_date" jdbcType="VARCHAR" property="hire_date"/>
         <result column="group1" jdbcType="VARCHAR" property="group1"/>
         <result column="group_leader" jdbcType="VARCHAR" property="group_leader"/>
-        <id column="com_id" jdbcType="INTEGER" property="com_id"/>
+        <result column="com_id" jdbcType="INTEGER" property="com_id"/>
         <result column="com_name" jdbcType="VARCHAR" property="com_name"/>
     </resultMap>
     <select id="staffList" resultMap="BaseResultMap">
-        select * from staff
+        select * from staff where com_id = #{com_id}
+    </select>
+    <select id="depStaffList" resultMap="BaseResultMap">
+        select * from staff where dep_id = #{dep_id}
     </select>
     <insert id="addStaff">
         insert into staff (id,name,gender,birth_date,id_number,phone,email,position,dep_id,department,hire_date,group1,group_leader,com_id,com_name)
         values (#{id},#{name},#{gender},#{birth_date},#{id_number},#{phone},#{email},#{position},#{dep_id},#{department},#{hire_date},#{group1},#{group_leader},#{com_id},#{com_name})
     </insert>
-
+    <update id="updateStaff">
+        UPDATE staff
+        SET name = #{name},
+            gender = #{gender},
+            birth_date = #{birth_date},
+            id_number = #{id_number},
+            phone = #{phone},
+            email = #{email},
+            position = #{position},
+            hire_date = #{hire_date},
+            group1 = #{group1},
+            group_leader = #{group_leader}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteById">
+        delete from staff where id = #{id}
+    </delete>
 </mapper>

@@ -1,7 +1,7 @@
 <template>
   <div class="heading">部门信息</div>
   <div>
-    <el-card class="box-card" style="width: 100%">
+    <el-card class="box-card" style="width: 100%;" :body-style="{ padding: '20px' }">
       <el-form :model="dep" label-width="120px" style="padding-right: 10px">
         <el-row style="padding-top: 10px">
           <el-col :span="12">
@@ -34,11 +34,14 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="部门介绍" prop="description">
-              <el-input v-model="tempDep.description" readonly size="large" />
+            <el-form-item label="所属公司" prop="com_name">
+              <el-input v-model="dep.com_name" readonly size="large" />
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item label="部门介绍" prop="introduction">
+          <el-input v-model="dep.description" type="textarea" readonly/>
+        </el-form-item>
         <div style="text-align: center;" >
           <!--          type="info"-->
           <el-button
@@ -53,7 +56,7 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="部门名称" prop="department">
-                <el-input v-model="tempDep.department" readonly />
+                <el-input v-model="tempDep.department" disabled />
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -81,11 +84,14 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="部门介绍" prop="description">
-                <el-input v-model="tempDep.description" />
+              <el-form-item label="所属公司" prop="com_name">
+                <el-input v-model="tempDep.com_name" disabled/>
               </el-form-item>
             </el-col>
           </el-row>
+          <el-form-item label="部门介绍" prop="introduction">
+            <el-input v-model="tempDep.description" type="textarea" readonly/>
+          </el-form-item>
         </el-form>
         <template #footer>
           <span class="dialog-footer">
@@ -119,6 +125,8 @@ export default {
       d_name:'',
       location: '',
       description: '',
+      com_id:'',
+      com_name:'',
     });
     const tempDep = reactive({
       department: '',
@@ -127,6 +135,8 @@ export default {
       d_name:'',
       location: '',
       description: '',
+      com_id:'',
+      com_name:'',
     });
 
 

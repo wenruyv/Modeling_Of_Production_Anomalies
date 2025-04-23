@@ -13,12 +13,27 @@ public class StaffServiceImpl implements StaffService {
     @Autowired
     private StaffMapper staffMapper;
     @Override
-    public List<Staff> staffList() {
-        return staffMapper.staffList();
+    public List<Staff> staffList(int com_id) {
+        return staffMapper.staffList(com_id);
+    }
+
+    @Override
+    public List<Staff> depStaffList(int dep_id) {
+        return staffMapper.depStaffList(dep_id);
     }
 
     @Override
     public int addStaff(Staff staff) {
         return staffMapper.addStaff(staff);
+    }
+
+    @Override
+    public int updateStaff(Staff staff) {
+        return staffMapper.updateStaff(staff);
+    }
+
+    @Override
+    public int deleteById(int id) {
+        return staffMapper.deleteById(id);
     }
 }

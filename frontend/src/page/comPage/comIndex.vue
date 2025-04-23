@@ -65,12 +65,12 @@
 </template>
 
 <script>
-import { OfficeBuilding, Menu,User } from '@element-plus/icons-vue';
+import {OfficeBuilding, Menu, User, Document} from '@element-plus/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ref, watch, onMounted } from 'vue';
 
 export default {
-  components: { OfficeBuilding, Menu },
+
 
   setup() {
     const router = useRouter();
@@ -101,13 +101,20 @@ export default {
       },
       {
         id: '4',
+        icon: Document,
+        title: '生产信息',
+        router: 'comInformation',
+        Subclass: [], // 是否有二级菜单
+      },
+      {
+        id: '5',
         icon: OfficeBuilding,
         title: '部门管理',
         router: 'departmentList',
         Subclass: [], // 是否有二级菜单
       },
       {
-        id: '5',
+        id: '6',
         icon: User,
         title: '人员管理',
         router: 'peopleList',

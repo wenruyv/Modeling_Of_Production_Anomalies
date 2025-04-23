@@ -11,8 +11,11 @@ import java.util.List;
 public interface CompanyMapper {
     int addCompany(Company company);
     Company selectByC_username(String c_username);
+    Company findById(int id);
     int updateCompany(Company company);
     String isEmptyOrg(String c_username);
+    String orgById(int id);
     List<Company> companyList();
     int updateC_org(String c_username,String c_org);
+    int deleteById(int id);
 }

@@ -1,15 +1,19 @@
 <template>
-  <div >
+  <div class="container">
     <div class="heading">员工信息
-      <el-button type="primary"
-                 @click="dialogFormVisible = true"
-                 size="large"
-                 style="width: 100px;float: right;" >添加员工</el-button>
+<!--      <el-button type="primary"-->
+<!--                 @click="dialogFormVisible = true"-->
+<!--                 size="large"-->
+<!--                 style="width: 100px;float: right;" >添加员工</el-button>-->
     </div>
-    <div>
-      <el-card class="box-card" style="width: 100%">
+    <div class="table-container">
+      <el-card class="box-card">
         <el-table :data="paginatedData" stripe style="width: 100%">
-          <el-table-column prop="name" label="姓名" min-width="100" />
+          <el-table-column prop="name" label="姓名" min-width="100">
+            <template #default="scope">
+              <div class="scrollable-cell" :title="scope.row.name">{{ scope.row.name }}</div>
+            </template>
+          </el-table-column>
           <el-table-column prop="gender" label="性别" min-width="100" />
           <el-table-column prop="phone" label="联系电话" min-width="100" />
           <el-table-column prop="email" label="邮箱" min-width="100" />
@@ -17,6 +21,12 @@
           <el-table-column prop="department" label="所属部门" min-width="100" />
           <el-table-column prop="group" label="所属小组" min-width="100" />
           <el-table-column prop="group_leader" label="组长" min-width="100" />
+          <!-- 操作列 -->
+          <el-table-column label="操作" min-width="100">
+            <template #default="scope">
+              <el-button size="small" @click="openDetailDialog(scope.row)">详情</el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <el-pagination
             background
@@ -29,115 +39,138 @@
         />
       </el-card>
     </div>
-    <!-- 弹窗添加员工-->
-    <el-dialog v-model="dialogFormVisible" title="添加员工信息">
-      <el-form :model="staff" :rules="rules" ref="staffForm" label-width="120px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="姓名" prop="name">
-              <el-input v-model="staff.name" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="性别" prop="gender">
-              <el-select v-model="staff.gender" placeholder="请选择">
-                <el-option label="男" value="男" />
-                <el-option label="女" value="女" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="出生日期" prop="birth_date">
-              <el-date-picker
-                  v-model="staff.birth_date"
-                  type="date"
-                  placeholder="请选择日期"
-                  format="YYYY/MM/DD"
-                  value-format="YYYY-MM-DD"
-                  style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="身份证" prop="id_number">
-              <el-input v-model="staff.id_number" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="联系电话" prop="phone">
-              <el-input v-model="staff.phone" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="联系邮箱" prop="email">
-              <el-input v-model="staff.email" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="所属部门" prop="department">
-              <el-tree-select
-                  v-model="staff.department"
-                  :data="organization"
-                  :props="treeProps"
-                  :render-after-expand="false"
-                  placeholder="请选择部门"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="职位" prop="position">
-              <el-tree-select
-                  v-model="staff.position"
-                  :data="organization1"
-                  :props="treeProps"
-                  :render-after-expand="false"
-                  placeholder="请选择职位"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="入职日期" prop="hire_date">
-              <el-date-picker
-                  v-model="staff.hire_date"
-                  type="date"
-                  placeholder="请选择日期"
-                  format="YYYY/MM/DD"
-                  value-format="YYYY-MM-DD"
-                  style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="所属小组" prop="group1">
-              <el-input v-model="staff.group1" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="组长" prop="group_leader">
-              <el-input v-model="staff.group_leader" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取消</el-button>
-            <el-button type="primary" @click="insertStaff" >
-              添加
-            </el-button>
-          </span>
-      </template>
+    <!-- 员工详情弹窗 -->
+    <el-dialog v-model="detailDialogVisible" title="员工详情" width="60%">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="姓名">{{ currentStaff.name }}</el-descriptions-item>
+        <el-descriptions-item label="性别">{{ currentStaff.gender }}</el-descriptions-item>
+        <el-descriptions-item label="出生日期">{{ currentStaff.birth_date }}</el-descriptions-item>
+        <el-descriptions-item label="身份证号">{{ currentStaff.id_number }}</el-descriptions-item>
+        <el-descriptions-item label="联系电话">{{ currentStaff.phone }}</el-descriptions-item>
+        <el-descriptions-item label="邮箱">{{ currentStaff.email }}</el-descriptions-item>
+        <el-descriptions-item label="职位">{{ currentStaff.position }}</el-descriptions-item>
+        <el-descriptions-item label="所属部门">{{ currentStaff.department }}</el-descriptions-item>
+        <el-descriptions-item label="所属小组">{{ currentStaff.group }}</el-descriptions-item>
+        <el-descriptions-item label="组长">{{ currentStaff.group_leader }}</el-descriptions-item>
+        <el-descriptions-item label="入职日期">{{ currentStaff.hire_date }}</el-descriptions-item>
+        <el-descriptions-item label="所属公司">{{ currentStaff.com_name }}</el-descriptions-item>
+      </el-descriptions>
     </el-dialog>
+<!--    &lt;!&ndash; 弹窗添加员工&ndash;&gt;-->
+<!--    <el-dialog v-model="dialogFormVisible" title="添加员工信息">-->
+<!--      <el-form :model="staff" :rules="rules" ref="staffForm" label-width="120px">-->
+<!--        <el-row>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="姓名" prop="name">-->
+<!--              <el-input v-model="staff.name" />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="性别" prop="gender">-->
+<!--              <el-select v-model="staff.gender" placeholder="请选择">-->
+<!--                <el-option label="男" value="男" />-->
+<!--                <el-option label="女" value="女" />-->
+<!--              </el-select>-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="出生日期" prop="birth_date">-->
+<!--              <el-date-picker-->
+<!--                  v-model="staff.birth_date"-->
+<!--                  type="date"-->
+<!--                  placeholder="请选择日期"-->
+<!--                  format="YYYY/MM/DD"-->
+<!--                  value-format="YYYY-MM-DD"-->
+<!--                  style="width: 100%"-->
+<!--              />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="身份证" prop="id_number">-->
+<!--              <el-input v-model="staff.id_number" />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="联系电话" prop="phone">-->
+<!--              <el-input v-model="staff.phone" />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="联系邮箱" prop="email">-->
+<!--              <el-input v-model="staff.email" />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="所属部门" prop="department">-->
+<!--              <el-tree-select-->
+<!--                  v-model="staff.department"-->
+<!--                  :data="organization"-->
+<!--                  :props="treeProps"-->
+<!--                  :render-after-expand="false"-->
+<!--                  placeholder="请选择部门"-->
+<!--                  @node-click="handleDepartmentSelect"-->
+<!--              />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="所属公司" prop="com_name">-->
+<!--              <el-input v-model="staff.com_name" disabled/>-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="职位" prop="position">-->
+<!--              <el-tree-select-->
+<!--                  v-model="staff.position"-->
+<!--                  :data="organization1"-->
+<!--                  :props="treeProps"-->
+<!--                  :render-after-expand="false"-->
+<!--                  placeholder="请选择职位"-->
+<!--              />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="入职日期" prop="hire_date">-->
+<!--              <el-date-picker-->
+<!--                  v-model="staff.hire_date"-->
+<!--                  type="date"-->
+<!--                  placeholder="请选择日期"-->
+<!--                  format="YYYY/MM/DD"-->
+<!--                  value-format="YYYY-MM-DD"-->
+<!--                  style="width: 100%"-->
+<!--              />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="所属小组" prop="group1">-->
+<!--              <el-input v-model="staff.group1" />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="组长" prop="group_leader">-->
+<!--              <el-input v-model="staff.group_leader" />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--        </el-row>-->
+<!--      </el-form>-->
+<!--      <template #footer>-->
+<!--          <span class="dialog-footer">-->
+<!--            <el-button @click="dialogFormVisible = false">取消</el-button>-->
+<!--            <el-button type="primary" @click="insertStaff" >-->
+<!--              添加-->
+<!--            </el-button>-->
+<!--          </span>-->
+<!--      </template>-->
+<!--    </el-dialog>-->
 
   </div>
 </template>
@@ -169,10 +202,13 @@ export default{
       phone:'',
       email:'',
       position:'',
+      dep_id:'',
       department:'',
       hire_date:'',
       group1:'',
       group_leader: '',
+      com_id:'',
+      com_name:'',
     })
     const rules = {
       name: [{ required: true, message: '姓名不能为空', trigger: 'blur' }],
@@ -197,6 +233,15 @@ export default{
       const end = start + staff_data.pageSize;
       return staff_data.user_array.slice(start, end);
     });
+    // 添加在setup()函数顶部
+    const detailDialogVisible = ref(false);
+    const currentStaff = ref({});
+
+// 打开详情对话框
+    const openDetailDialog = (row) => {
+      currentStaff.value = { ...row };
+      detailDialogVisible.value = true;
+    };
     //organization树形选择器数据
     async function orgTree() {
       try {
@@ -231,7 +276,12 @@ export default{
     }
     async function staffList(){
       try {
-        const res = await new proxy.$request(proxy.$urls.m().staffList).modeget()
+        const c_username = localStorage.getItem('c_username');
+
+        const res1 = await new proxy.$request(proxy.$urls.m().loadCompany + '?c_username=' + c_username).modeget();
+        const com_id = res1.data.id;
+        // 正确传递com_id参数
+        const res = await new proxy.$request(proxy.$urls.m().staffList + '?com_id=' + com_id).modeget()
         console.log(res)
         // 假设返回的res包含数据对象data和总条数total
         if (res && res.data && Array.isArray(res.data)) {
@@ -247,7 +297,7 @@ export default{
       }
     }
     //添加员工
-    const insertStaff = async () => {
+    /*const insertStaff = async () => {
       try {
         const valid = await proxy.$refs.staffForm.validate();
         console.log("表单验证结果" + valid);
@@ -266,14 +316,17 @@ export default{
       } catch (e) {
         console.error(e);
       }
-    }
+    }*/
     // 分页触发事件
     function currentchange(e) {
       staff_data.page = e; // 更新页码
     }
     return {...toRefs(staff_data),paginatedData,currentchange,
-      dialogFormVisible,formLabelWidth,staff,rules,insertStaff,
-      treeProps,organization,orgTree,organization1
+      dialogFormVisible,formLabelWidth,staff,rules,/*insertStaff,*/
+      treeProps,organization,orgTree,organization1,
+      detailDialogVisible,  // 新增
+      currentStaff,        // 新增
+      openDetailDialog     // 新增
     }
   }
 

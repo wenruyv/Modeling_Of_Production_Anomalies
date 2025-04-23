@@ -1,28 +1,35 @@
 <template>
-  <div class="heading">公司信息
-    <el-button type="primary"
-               @click="dialogFormVisible = true"
-               size="large"
-               style="width: 100px;float: right;" >添加公司</el-button>
-  </div>
-    <div>
-      <div>
-
+  <div class="container">
+    <div style="margin-bottom: 10px;">
+      <div class="heading">公司信息
+        <el-button type="primary"
+                   @click="dialogFormVisible = true"
+                   style="width: 100px;float: right;" >添加公司</el-button>
       </div>
-      <el-card class="box-card" style="width: 100%">
+    </div>
+    <div>
+      <el-card class="table-container" >
         <el-table :data="paginatedData" stripe style="width: 100%">
   <!--        <el-table-column prop="id" label="id" min-width="100" />-->
-          <el-table-column prop="name" label="公司名称" min-width="100" />
+          <el-table-column prop="name" label="公司名称" min-width="100">
+            <template #default="scope">
+              <div class="scrollable-cell" :title="scope.row.name">{{ scope.row.name }}</div>
+            </template>
+          </el-table-column>
+
           <el-table-column prop="location" label="地址" min-width="100"/>
           <el-table-column prop="established_date" label="成立时间" min-width="100"/>
           <el-table-column prop="type" label="类型" min-width="100" />
-          <el-table-column prop="phone" label="联系电话" min-width="100" />
-          <el-table-column prop="email" label="邮箱" min-width="100"/>
           <el-table-column prop="ceo_name" label="CEO姓名" min-width="100"/>
-          <el-table-column prop="web" label="网址" min-width="100" />
-          <el-table-column prop="introduction" label="简介" min-width="100" />
           <el-table-column prop="c_username" label="管理员账号" min-width="100"/>
           <el-table-column prop="c_password" label="管理员密码" min-width="100"/>
+          <!-- 操作列 -->
+          <el-table-column label="操作" min-width="120">
+            <template #default="scope">
+              <el-button size="small" @click="openDetailDialog(scope.row)">详情</el-button>
+              <el-button size="small" type="danger" @click="deleteRow(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </el-card>
       <!-- 弹窗添加公司-->
@@ -115,6 +122,27 @@
           </span>
         </template>
       </el-dialog>
+      <!-- 公司详情弹窗 -->
+      <el-dialog v-model="detailDialogVisible" title="公司详情" width="70%">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="公司名称">{{ currentCompany.name }}</el-descriptions-item>
+          <el-descriptions-item label="公司地址">{{ currentCompany.location }}</el-descriptions-item>
+          <el-descriptions-item label="公司类型">{{ currentCompany.type }}</el-descriptions-item>
+          <el-descriptions-item label="成立时间">{{ currentCompany.established_date }}</el-descriptions-item>
+          <el-descriptions-item label="联系电话">{{ currentCompany.phone }}</el-descriptions-item>
+          <el-descriptions-item label="联系邮箱">{{ currentCompany.email }}</el-descriptions-item>
+          <el-descriptions-item label="CEO姓名">{{ currentCompany.ceo_name }}</el-descriptions-item>
+          <el-descriptions-item label="官方网站">
+<!--            <a :href="currentCompany.web" target="_blank">{{ currentCompany.web }}</a>-->
+            {{ currentCompany.web }}
+          </el-descriptions-item>
+          <el-descriptions-item label="管理员账号">{{ currentCompany.c_username }}</el-descriptions-item>
+          <el-descriptions-item label="管理员密码">{{ currentCompany.c_password }}</el-descriptions-item>
+          <el-descriptions-item label="公司介绍" :span="2">
+            {{ currentCompany.introduction }}
+          </el-descriptions-item>
+        </el-descriptions>
+      </el-dialog>
       <el-pagination
           background
           layout="prev, pager, next"
@@ -125,11 +153,15 @@
           :hide-on-single-page="true"
       />
     </div>
+  </div>
 </template>
 
 <script>
 import {reactive, onMounted, getCurrentInstance, toRefs, computed, ref} from 'vue';
+import {ElButton} from "element-plus";
+import axios from 'axios';
 export default{
+  components: {ElButton},
   setup(){
     const {proxy} = getCurrentInstance()
     //请求数据
@@ -176,6 +208,14 @@ export default{
       const end = start + company_data.pageSize;
       return company_data.company_array.slice(start, end);
     });
+    const detailDialogVisible = ref(false);
+    const currentCompany = ref({});
+
+// 打开详情对话框
+    const openDetailDialog = (row) => {
+      currentCompany.value = { ...row };
+      detailDialogVisible.value = true;
+    };
     //加载公司列表
     async function companyList(){
       try {
@@ -214,16 +254,32 @@ export default{
         console.error(e);
       }
     }
-
+// 删除记录
+    const deleteRow = async (id) => {
+      try {
+        if (confirm('确定要删除这条记录吗？')) {
+          await axios.delete(`api/company/delete/${id}`);
+          userList(); // 刷新数据
+          new proxy.$tips('删除记录成功', 'success').message_();
+        }
+      } catch (error) {
+        console.error('删除记录失败', error);
+      }
+    };
     // 分页触发事件
     function currentchange(e) {
       company_data.page = e; // 更新页码
     }
-    return {...toRefs(company_data),paginatedData,currentchange,dialogFormVisible,formLabelWidth,company,rules,insertCom}
+    return {...toRefs(company_data),paginatedData,currentchange,dialogFormVisible,formLabelWidth,
+      company,rules,insertCom,deleteRow,  detailDialogVisible,  // 新增
+      currentCompany,      // 新增
+      openDetailDialog     // 新增
+    }
   }
 
 }
 </script>
 
 <style>
+
 </style>

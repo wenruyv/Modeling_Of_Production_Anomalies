@@ -18,6 +18,7 @@ const urls = class{
         const resourceTree = `${url}resource/tree`
         //生产信息
         const informationTree = `${url}information/tree`
+        const proList = `${url}proInfo/proList`
         const saveTree = `${url}information/saveTree`
         //异常分类列表
         const ab_class = `${url}abnormal/list`
@@ -27,6 +28,9 @@ const urls = class{
         const updateCompany = `${url}organization/updateCompany`
         const updateC_org = `${url}organization/updateC_org`
         const isEmptyOrg = `${url}organization/isEmptyOrg`
+        const proInfo = `${url}proInfo/list`
+        const updateProInfo = `${url}proInfo/update`
+        const addProInfo = `${url}proInfo/add`
         const addDepartment = `${url}depart/addDepartment`
         const departmentList = `${url}depart/list`
         const staffList = `${url}staff/list`
@@ -35,12 +39,14 @@ const urls = class{
         //部门管理员获取部门信息
         const loadDep = `${url}depart/depInfo`
         const updateDep = `${url}depart/updateDep`
+        const depStaffList = `${url}staff/depList`
+        const orgById = `${url}organization/orgById`
 
         return {
-             login,
+             login,proList,
             user, company_list, add_company, ab_class,orgTree,resourceTree,informationTree,saveTree,updateTree,addTree,deleteTree,
             companyIndex,loadCompany,updateCompany,updateC_org,isEmptyOrg,addDepartment,departmentList,staffList,addStaff,
-            loadDep,updateDep
+            loadDep,updateDep,proInfo,addProInfo,updateProInfo,depStaffList,orgById
         }
     }
 

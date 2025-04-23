@@ -49,9 +49,38 @@ public class DepartmentController {
     }
     @PostMapping("/updateDep")
     public int updateDep(@RequestBody Department department) {
+        //1. 先获取旧的部门信息
+        Department oldDep = departmentService.selectDepById(department.getId());
+        if (oldDep == null) {
+            return 0; // 部门不存在
+        }
+        //2. 更新部门信息
         int result = departmentService.updateDep(department);
-        if(result == 1) return result;
+
+        //3. 检查并更新用户
+        String oldUsername = oldDep.getD_username();
+
+        String oldPassword = oldDep.getD_password();
+        String newUsername = department.getD_username();
+        String newPassword = department.getD_password();
+        if(oldUsername != newUsername || oldPassword !=newPassword){
+            // 3.1 如果被修改，先查询旧用户
+            User user = userService.findByUsername(oldUsername);
+            System.out.println(user);
+            if(user != null){
+                user.setUsername(newUsername);
+                user.setPassword(newPassword);
+                userService.updateUser(user);
+            }
+        }
+        return result;
+    }
+    @DeleteMapping("/delete/{id}")
+    public int deleteDepById(@PathVariable int id){
+        Department department = departmentService.selectDepById(id);
+        User user = userService.findByUsername(department.getD_username());
+        int result = userService.deleteUserById(user.getUser_id());
+        if(result == 1) return departmentService.deleteDepById(id);
         else return 0;
     }
-
 }

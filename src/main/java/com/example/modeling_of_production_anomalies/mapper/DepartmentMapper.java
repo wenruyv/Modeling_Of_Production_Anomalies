@@ -14,5 +14,7 @@ public interface DepartmentMapper {
     int addDepartment(Department department);
     Department selectByD_username(String d_username);
     int updateDep(Department department);
+    int deleteDepById(int id);
+    Department selectDepById(int id);
 
 }
