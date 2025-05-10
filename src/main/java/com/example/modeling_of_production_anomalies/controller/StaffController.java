@@ -37,4 +37,12 @@ public class StaffController {
     public int deleteById(@PathVariable int id){
         return staffService.deleteById(id);
     }
+    @DeleteMapping("/deleteDep/{dep_id}")
+    public int deleteByDepId(@PathVariable int dep_id){
+        return staffService.deleteByDepId(dep_id);
+    }
+    @DeleteMapping("/deleteCom/{com_id}")
+    public int deleteByComId(@PathVariable int com_id){
+        return staffService.deleteByComId(com_id);
+    }
 }

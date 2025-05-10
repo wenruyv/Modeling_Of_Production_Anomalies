@@ -36,4 +36,14 @@ public class StaffServiceImpl implements StaffService {
     public int deleteById(int id) {
         return staffMapper.deleteById(id);
     }
+
+    @Override
+    public int deleteByDepId(int dep_id) {
+        return staffMapper.deleteByDepId(dep_id);
+    }
+
+    @Override
+    public int deleteByComId(int com_id) {
+        return staffMapper.deleteByComId(com_id);
+    }
 }

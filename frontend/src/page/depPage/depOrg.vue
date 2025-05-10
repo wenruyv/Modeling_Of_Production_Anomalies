@@ -1,5 +1,10 @@
 <template>
-  <div class="heading">部门结构图</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><OfficeBuilding /></el-icon>
+      <span>部门结构图</span>
+    </div>
+  </div>
   <div style="height: 520px; width: 100%;">
     <el-tabs type="border-card">
       <el-tab-pane
@@ -24,12 +29,13 @@
 <script>
 import { ElSwitch, ElColorPicker } from 'element-plus'
 import {getCurrentInstance, onMounted, ref} from 'vue'
-
+import {OfficeBuilding} from "@element-plus/icons-vue";
 export default {
   name: "baseTree",
   components: {
     ElSwitch,
     ElColorPicker,
+    OfficeBuilding,
 
   },
   setup() {

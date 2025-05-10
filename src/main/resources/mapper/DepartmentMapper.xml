@@ -43,4 +43,7 @@
     <delete id="deleteDepById">
         delete from department where id = #{id}
     </delete>
+    <delete id="deleteDepByComId">
+        delete from department where com_id = #{com_id}
+    </delete>
 </mapper>

@@ -47,4 +47,10 @@
     <delete id="deleteById">
         delete from staff where id = #{id}
     </delete>
+    <delete id="deleteByDepId">
+        delete from staff where dep_id = #{dep_id}
+    </delete>
+    <delete id="deleteByComId">
+        delete from staff where com_id = #{com_id}
+    </delete>
 </mapper>

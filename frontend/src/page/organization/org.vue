@@ -1,5 +1,13 @@
 <template>
-  <div class="heading">生产组织结构图</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><OfficeBuilding /></el-icon>
+      <span>生产组织结构图</span>
+    </div>
+    <div class="operation-area">
+    </div>
+  </div>
+
   <div>
     <el-tabs type="border-card">
       <el-tab-pane
@@ -56,13 +64,13 @@
 <script>
 import { ElSwitch, ElColorPicker } from 'element-plus'
 import {getCurrentInstance, onMounted, ref} from 'vue'
-import { Edit } from '@element-plus/icons-vue';
+import { Edit,OfficeBuilding } from '@element-plus/icons-vue';
 import shortid from 'shortid';
 
 export default {
 
   name: "baseTree",
-  components: {ElSwitch, ElColorPicker, Edit},
+  components: {ElSwitch, ElColorPicker, Edit,OfficeBuilding},
   setup() {
     const { proxy } = getCurrentInstance();
     const cloneNodeDrag = ref(true);

@@ -44,6 +44,8 @@ export default {
         const res = await new proxy.$request(proxy.$urls.m().login,obj).modepost()
         console.log(res);
         if (res.data) {
+          //session保存登录信息
+          sessionStorage.setItem("username", res.data.username);
 
           if(res.data.user_type == 1){
             localStorage.setItem('s_username', res.data.username);

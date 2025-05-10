@@ -14,6 +14,9 @@
     <select id="findInfoByC_id" resultMap="BaseResultMap">
         select * from pro_info where c_id =#{c_id}
     </select>
+    <select id="findInfoById" resultMap="BaseResultMap">
+        select * from pro_info where id =#{id}
+    </select>
     <select id="proInfoList" resultMap="BaseResultMap">
         select * from pro_info
     </select>
@@ -28,4 +31,10 @@
     <insert id="addProInfo">
         insert into pro_info (name,c_id,c_name,info) values (#{name},#{c_id},#{c_name},#{info})
     </insert>
+    <delete id="deleteProInfo">
+        delete from pro_info where id = #{id}
+    </delete>
+    <delete id="deleteByComId">
+        delete from pro_info where c_id = #{c_id}
+    </delete>
 </mapper>

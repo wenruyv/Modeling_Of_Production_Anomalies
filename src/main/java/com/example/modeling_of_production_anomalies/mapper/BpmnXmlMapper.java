@@ -29,13 +29,23 @@ public interface BpmnXmlMapper {
     BpmnXml findById(@Param("id") Long id);
 
     /**
-     * 更新BpmnXml的xmlData根据name
+     * 根据name和userName查找BpmnXml
      *
-     * @param bpmnXml 包含新xmlData和name的实体
+     * @param name 名称
+     * @param userName 用户名称
+     * @return BpmnXml实体
+     */
+    @Select("SELECT * FROM bpmn_xml WHERE name = #{name} AND user_name = #{userName}")
+    BpmnXml findByNameAndUserName(@Param("name") String name, @Param("userName") String userName);
+
+    /**
+     * 更新BpmnXml的data根据name和userName
+     *
+     * @param bpmnXml 包含新data、name和userName的实体
      * @return 更新影响的行数
      */
-    @Update("UPDATE bpmn_xml SET data = #{data} WHERE name = #{name}")
-    int updateXmlDataByName(BpmnXml bpmnXml);
+    @Update("UPDATE bpmn_xml SET data = #{data} WHERE name = #{name} AND user_name = #{userName}")
+    int updateDataByNameAndUserName(BpmnXml bpmnXml);
 
     /**
      * 插入新的BpmnXml
@@ -43,7 +53,7 @@ public interface BpmnXmlMapper {
      * @param bpmnXml 实体
      * @return 插入影响的行数
      */
-    @Insert("INSERT INTO bpmn_xml(name, xmlData) VALUES(#{name}, #{xmlData})")
+    @Insert("INSERT INTO bpmn_xml(name, data, user_name) VALUES(#{name}, #{data}, #{userName})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insertBpmnXml(BpmnXml bpmnXml);
 
@@ -54,4 +64,14 @@ public interface BpmnXmlMapper {
      */
     @Select("SELECT * FROM bpmn_xml")
     List<BpmnXml> findAll();
+
+    /**
+     * 根据name和userName删除BpmnXml
+     *
+     * @param name 名称
+     * @param userName 用户名称
+     * @return 删除影响的行数
+     */
+    @Delete("DELETE FROM bpmn_xml WHERE name = #{name} AND user_name = #{userName}")
+    int deleteByNameAndUserName(@Param("name") String name, @Param("userName") String userName);
 }

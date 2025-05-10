@@ -1,7 +1,11 @@
 <template>
-
-    <div class="heading">首页</div>
-    <div >欢迎访问 {{ company.name }} 公司首页。</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><Menu /></el-icon>
+      <span>首页</span>
+    </div>
+  </div>
+    <div >欢迎访问 {{ company.name }} 首页。</div>
   <div class="tips">
     <div >公司简介：{{company.introduction}}</div>
     <div>联系电话：{{company.phone}}</div>
@@ -13,8 +17,9 @@
 <script>
 
 import {getCurrentInstance, onMounted, reactive} from "vue";
-
+import {Menu} from '@element-plus/icons-vue';
 export default{
+  components:{Menu},
   setup(){
     const { proxy } = getCurrentInstance();
     // 公司信息

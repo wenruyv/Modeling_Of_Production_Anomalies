@@ -14,7 +14,9 @@
     <select id="findByUsername" resultMap="BaseResultMap">
         select * from user where username =#{username}
     </select>
-
+    <select id="findByUserId" resultMap="BaseResultMap">
+        select * from user where user_id =#{user_id}
+    </select>
     <select id="UserList" resultMap="BaseResultMap">
         select * from user
     </select>

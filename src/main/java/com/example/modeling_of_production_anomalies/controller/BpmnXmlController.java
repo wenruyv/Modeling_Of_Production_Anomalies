@@ -1,3 +1,4 @@
+// src/main/java/com/example/modeling_of_production_anomalies/controller/BpmnXmlController.java
 package com.example.modeling_of_production_anomalies.controller;
 
 import com.example.modeling_of_production_anomalies.entity.BpmnXml;
@@ -22,18 +23,19 @@ public class BpmnXmlController {
     }
 
     /**
-     * 根据name查找BpmnXml
+     * 根据name和userName查找BpmnXml
      *
      * @param name 名称
+     * @param userName 用户名称
      * @return BpmnXml实体
      */
-    @GetMapping("/findByName/{name}")
-    public ResponseEntity<BpmnXml> findByName(@PathVariable String name) {
+    @GetMapping("/findByNameAndUserName/{name}/{userName}")
+    public ResponseEntity<BpmnXml> findByNameAndUserName(@PathVariable String name, @PathVariable String userName) {
         try {
-            BpmnXml bpmnXml = bpmnXmlService.findByName(name);
+            BpmnXml bpmnXml = bpmnXmlService.findByNameAndUserName(name, userName);
             return getBpmnXmlResponse(bpmnXml);
         } catch (Exception e) {
-            logger.error("查找BpmnXml时发生错误，名称: {}", name, e);
+            logger.error("查找BpmnXml时发生错误，名称: {}, 用户名称: {}", name, userName, e);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -56,21 +58,40 @@ public class BpmnXmlController {
     }
 
     /**
-     * 更新BpmnXml的xmlData根据name
+     * 更新BpmnXml的data根据name和userName
      *
-     * @param name    名称
-     * @param bpmnXml 包含新xmlData和name的实体
+     * @param name 名称
+     * @param userName 用户名称
+     * @param bpmnXml 包含新data的实体
      * @return 更新结果
      */
-    @PutMapping("/updateByName/{name}")
-    public ResponseEntity<String> updateByName(@PathVariable String name, @RequestBody BpmnXml bpmnXml) {
+    @PutMapping("/updateDataByNameAndUserName/{name}/{userName}")
+    public ResponseEntity<String> updateDataByNameAndUserName(@PathVariable String name, @PathVariable String userName, @RequestBody BpmnXml bpmnXml) {
         try {
             bpmnXml.setName(name);
-            boolean success = bpmnXmlService.updateXmlDataByName(bpmnXml);
+            bpmnXml.setUserName(userName);
+            boolean success = bpmnXmlService.updateDataByNameAndUserName(bpmnXml);
             return success ? ResponseEntity.ok("更新成功") : ResponseEntity.badRequest().body("更新失败");
         } catch (Exception e) {
-            logger.error("更新BpmnXml时发生错误，名称: {}", name, e);
+            logger.error("更新BpmnXml时发生错误，名称: {}, 用户名称: {}", name, userName, e);
             return ResponseEntity.internalServerError().body("更新时发生内部错误");
+        }
+    }
+
+    /**
+     * 根据name和userName新建BpmnXml
+     *
+     * @param bpmnXml 包含name、userName和data的实体
+     * @return 插入结果
+     */
+    @PostMapping("/insertByNameAndUserName")
+    public ResponseEntity<String> insertByNameAndUserName(@RequestBody BpmnXml bpmnXml) {
+        try {
+            boolean success = bpmnXmlService.insertBpmnXml(bpmnXml);
+            return success ? ResponseEntity.ok("插入成功") : ResponseEntity.badRequest().body("插入失败");
+        } catch (Exception e) {
+            logger.error("插入BpmnXml时发生错误，名称: {}, 用户名称: {}", bpmnXml.getName(), bpmnXml.getUserName(), e);
+            return ResponseEntity.internalServerError().body("插入时发生内部错误");
         }
     }
 
@@ -98,5 +119,23 @@ public class BpmnXmlController {
      */
     private ResponseEntity<BpmnXml> getBpmnXmlResponse(BpmnXml bpmnXml) {
         return bpmnXml != null ? ResponseEntity.ok(bpmnXml) : ResponseEntity.notFound().build();
+    }
+
+    /**
+     * 根据name和userName删除BpmnXml
+     *
+     * @param name 名称
+     * @param userName 用户名称
+     * @return 删除结果
+     */
+    @DeleteMapping("/deleteByNameAndUserName/{name}/{userName}")
+    public ResponseEntity<String> deleteByNameAndUserName(@PathVariable String name, @PathVariable String userName) {
+        try {
+            boolean success = bpmnXmlService.deleteByNameAndUserName(name, userName);
+            return success ? ResponseEntity.ok("删除成功") : ResponseEntity.badRequest().body("删除失败");
+        } catch (Exception e) {
+            logger.error("删除BpmnXml时发生错误，名称: {}, 用户名称: {}", name, userName, e);
+            return ResponseEntity.internalServerError().body("删除时发生内部错误");
+        }
     }
 }

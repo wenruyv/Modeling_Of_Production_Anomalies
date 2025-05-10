@@ -90,6 +90,16 @@ const routes = [
                 name: 'peopleList',
                 component: () => import('@/page/comPage/comStaff.vue')
             },
+            {
+                path: '/companyBpmn-viewer', //员工列表
+                name: 'companyBpmn-viewer',
+                component: () => import('@/page/abnormity/bpmn-viewer.vue')
+            },
+            {
+                path: '/companyBpmn-modeler', //员工列表
+                name: 'companyBpmn-modeler',
+                component: () => import('@/page/abnormity/bpmn-modeler.vue')
+            },
 
         ]
     },

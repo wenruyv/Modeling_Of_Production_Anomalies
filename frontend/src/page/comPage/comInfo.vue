@@ -1,5 +1,10 @@
 <template>
-    <div class="heading">公司信息</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><Document /></el-icon>
+      <span>公司信息</span>
+    </div>
+  </div>
     <div>
       <el-card class="box-card" style="width: 100%;" :body-style="{ padding: '20px' }">
       <el-form :model="company" label-width="120px" style="padding-right: 10px">
@@ -77,7 +82,7 @@
         </div>
       </el-form>
       <!-- 弹窗修改信息 -->
-      <el-dialog v-model="dialogFormVisible" title="修改公司信息">
+      <el-dialog v-model="dialogFormVisible" title="修改公司信息" @close="resetForm">
         <el-form :model="tempCompany" :rules="rules" ref="companyForm" label-width="120px">
           <el-row>
             <el-col :span="12">
@@ -143,7 +148,7 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="管理员账号" prop="c_username">
-                <el-input v-model="tempCompany.c_username" />
+                <el-input v-model="tempCompany.c_username" disabled/>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -174,7 +179,9 @@
 <script>
 import { getCurrentInstance, reactive, ref, onMounted } from 'vue';
 
+import { Document,Menu} from '@element-plus/icons-vue';
 export default {
+  components: {Document,Menu},
   setup() {
     const { proxy } = getCurrentInstance();
 
@@ -197,7 +204,7 @@ export default {
     });
 
     // 临时公司信息（弹窗数据）
-    const tempCompany = reactive({
+    const tempCompany = ref({
       name: '',
       location: '',
       type: '',
@@ -210,7 +217,13 @@ export default {
       c_password: '',
       introduction: '',
     });
-
+    // 添加resetForm方法
+    // 添加resetForm方法 - 修改为仅重置表单验证状态
+    const resetForm = () => {
+      if (proxy.$refs.companyForm) {
+        proxy.$refs.companyForm.resetFields();
+      }
+    };
     // 校验规则
     const rules = {
       name: [{ required: true, message: '公司名称不能为空', trigger: 'blur' }],
@@ -227,34 +240,33 @@ export default {
     };
 
     const openDialog = () => {
-      // 手动赋值将 company 的数据复制到 tempCompany 中
-      Object.assign(tempCompany, company); // 深拷贝的简化版，直接赋值
+      // 使用JSON深拷贝避免引用问题
+      tempCompany.value = JSON.parse(JSON.stringify(company));
       dialogFormVisible.value = true;
     };
 
     const updateCom = async () => {
       try {
-        // 表单验证
         const valid = await proxy.$refs.companyForm.validate();
+        console.log("表单验证结果" + valid);
         if (!valid) {
-          return; // 如果验证失败，直接返回
+          return;  // 如果验证失败，直接返回
         }
-
         // 发送修改请求
-        const res = await new proxy.$request(proxy.$urls.m().updateCompany, tempCompany).modepost();
+        const res = await new proxy.$request(proxy.$urls.m().updateCompany, tempCompany.value).modepost();
         console.log(res);
         if (res.data == 1) {
           new proxy.$tips('修改成功', 'success').message_();
           dialogFormVisible.value = false; // 关闭弹窗
           // 将临时变量的值赋给主界面数据
-          Object.assign(company, tempCompany);
+          Object.assign(company, tempCompany.value);
           await loadCompanyInfo();
         } else {
           new proxy.$tips('修改失败', 'error').message_();
         }
       } catch (error) {
         console.error(error);
-        new proxy.$tips('服务器发生错误', 'error').message_();
+        new proxy.$tips('服务器发生错误 或 表单验证不通过', 'error').message_();
       }
     };
 
@@ -286,7 +298,7 @@ export default {
 
     return {
       company,
-      tempCompany,
+      tempCompany,resetForm,
       dialogFormVisible,
       formLabelWidth,
       rules,

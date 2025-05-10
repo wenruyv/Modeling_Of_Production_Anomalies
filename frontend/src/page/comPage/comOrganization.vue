@@ -1,10 +1,23 @@
 <template>
-  <div className="heading">组织结构</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><OfficeBuilding /></el-icon>
+      <span>组织结构</span>
+    </div>
+    <div class="operation-area">
+      <!-- 添加标签按钮单独放在外面 -->
+      <el-button
+          class="add-tab-btn"
+          type="primary"
+          @click="addNewTab"
+      >
+        + 添加标签页
+      </el-button>
+    </div>
+  </div>
   <div>
     <el-tabs
         v-model="activeTabName"
-        editable
-        @edit="handleTabsEdit"
         type="border-card"
     >
       <el-tab-pane
@@ -12,6 +25,7 @@
           :key="tab.name"
           :label="tab.label || `Tab ${tab.name}`"
           :name="tab.name"
+          :closable="false"
           style="height: 410px; width: 100%;"
       >
         <vue3-tree-org ref="treeOrg"
@@ -28,7 +42,10 @@
                        @on-node-dblclick="onNodeDblclick"
         >
         </vue3-tree-org>
-        <el-button type="primary" :icon="Edit" style="float: right;margin-right: 10px;padding: 8px" @click="updateOrg"/>
+        <div>
+          <el-button type="danger" :icon="Delete" style="float: right;margin-right: 10px;padding: 8px" @click="deleteCurrentTab"/>
+          <el-button type="primary" :icon="Edit" style="float: right;margin-right: 10px;padding: 8px" @click="updateOrg"/>
+        </div>
       </el-tab-pane>
     </el-tabs>
 
@@ -51,8 +68,9 @@
 
 <script>
 import {getCurrentInstance, onMounted, reactive, ref, watch} from 'vue';
-import { Edit } from '@element-plus/icons-vue';
+import { Edit, OfficeBuilding, Delete, Plus } from '@element-plus/icons-vue';
 export default {
+  components: {Edit, OfficeBuilding, Delete, Plus},
   name: "BaseTree",
   setup() {
     const { proxy } = getCurrentInstance();
@@ -184,48 +202,54 @@ export default {
         new proxy.$tips('服务器发生错误', 'error').message_();
       }
     }
-// 修改 handleTabsEdit 函数
-    const handleTabsEdit = (targetName, action) => {
-      if (action === 'add') {
-        tabCounter.value += 1;
-        localStorage.setItem('tabCounter', tabCounter.value.toString());
-        const newTabName = `${tabCounter.value}`;
-        organization.value.push({
-          name: newTabName,
-          label: `New Tab ${newTabName}`,
-          expand: true
-        });
-        mergeOrganization();
-        activeTabName.value = newTabName;
-      } else if (action === 'remove') {
-        if (tempOrganization.value.length <= 1) {
-          new proxy.$tips('至少保留一个标签页', 'warning').message_();
-          return;
-        }
 
-        if (targetName === 'company_root') {
-          new proxy.$tips('不能删除公司根节点', 'warning').message_();
-          return;
-        }
-
-        const tabs = tempOrganization.value;
-        let newActiveName = activeTabName.value;
-
-        if (newActiveName === targetName) {
-          const targetIndex = tabs.findIndex(tab => tab.name === targetName);
-          const nextTab = tabs[targetIndex + 1] || tabs[targetIndex - 1];
-          if (nextTab) {
-            newActiveName = nextTab.name;
-          }
-        }
-
-        // 修改这里：同时从 organization 和 tempOrganization 中删除
-        organization.value = organization.value.filter(tab => tab.name !== targetName);
-        tempOrganization.value = tempOrganization.value.filter(tab => tab.name !== targetName);
-
-        activeTabName.value = newActiveName;
-      }
+    // 添加新标签页
+    const addNewTab = () => {
+      tabCounter.value += 1;
+      localStorage.setItem('tabCounter', tabCounter.value.toString());
+      const newTabName = `${tabCounter.value}`;
+      organization.value.push({
+        name: newTabName,
+        label: `New Tab ${newTabName}`,
+        expand: true
+      });
+      mergeOrganization();
+      activeTabName.value = newTabName;
     };
+
+    // 删除当前标签页
+    const deleteCurrentTab = () => {
+      if (tempOrganization.value.length <= 1) {
+        new proxy.$tips('至少保留一个标签页', 'warning').message_();
+        return;
+      }
+
+      const currentName = activeTabName.value;
+
+      if (currentName === 'company_root') {
+        new proxy.$tips('不能删除公司根节点', 'warning').message_();
+        return;
+      }
+
+      const tabs = tempOrganization.value;
+      let newActiveName = activeTabName.value;
+
+      if (currentName === newActiveName) {
+        const targetIndex = tabs.findIndex(tab => tab.name === currentName);
+        const nextTab = tabs[targetIndex + 1] || tabs[targetIndex - 1];
+        if (nextTab) {
+          newActiveName = nextTab.name;
+        }
+      }
+
+      // 从 organization 和 tempOrganization 中删除
+      organization.value = organization.value.filter(tab => tab.name !== currentName);
+      tempOrganization.value = tempOrganization.value.filter(tab => tab.name !== currentName);
+
+      activeTabName.value = newActiveName;
+      new proxy.$tips('标签页已删除', 'success').message_();
+    };
+
     //修改组织结构
     const updateOrg = async () => {
       try {
@@ -257,9 +281,10 @@ export default {
       organization,
       tempOrganization,
       activeTabName,
-      handleTabsEdit,
-      Edit,
+      Edit, Delete, Plus,
       updateOrg,
+      addNewTab,
+      deleteCurrentTab,
       company,
       detailDialogVisible,
       currentNode
@@ -267,6 +292,8 @@ export default {
   },
   methods: {
     onMenus({command, node}) {
+      // 保存当前激活的标签页
+      const currentActiveTab = this.activeTabName;
     },
     onExpand(e, data) {
       console.log(e, data);
@@ -297,8 +324,30 @@ export default {
 </script>
 
 <style>
+.heading {
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  color: #303133;
+}
+
+.heading .el-icon {
+  margin-right: 8px;
+  font-size: 24px;
+  color: #409EFF;
+}
 .el-tabs__new-tab {
   margin-right: 10px;
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.operation-area {
+  display: flex;
+  gap: 15px;
 }
 .node-label {
   display: flex;

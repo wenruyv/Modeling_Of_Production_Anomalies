@@ -15,6 +15,7 @@
           class="canvas"
           ref="canvas"
           @wheel="handleZoom"
+          @contextmenu.prevent="onContextMenu"
       ></div>
     </div>
     <!-- 在 template 部分添加弹窗 -->
@@ -94,12 +95,19 @@
         </div>
       </div>
     </el-dialog>
+    <!-- 可隐藏的工具窗口 -->
+    <div v-if="toolWindowVisible" class="tool-window">
+      <div class="tool-window-header">
+        <span>子流程视图</span>
+        <el-icon class="close-icon" @click="closeToolWindow"><Close /></el-icon>
+      </div>
+      <div class="tool-window-canvas" ref="toolWindowCanvas"></div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { ArrowLeft, Search} from '@element-plus/icons-vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import 'bpmn-js/dist/assets/diagram-js.css';
@@ -109,13 +117,18 @@ import BpmnModeler from 'bpmn-js/lib/Modeler';
 import ContextPadModule from 'bpmn-js/lib/features/context-pad';
 import ModelingModule from 'bpmn-js/lib/features/modeling';
 import TokenSimulationModule from 'bpmn-js-token-simulation';
-import { TRACE_EVENT} from 'bpmn-js-token-simulation/lib/util/EventHelper';
+import { TRACE_EVENT } from 'bpmn-js-token-simulation/lib/util/EventHelper';
+import { ArrowLeft, Search, Close } from '@element-plus/icons-vue';
+// 修改引入语句，添加BpmnViewer
+import BpmnViewer from 'bpmn-js/lib/Viewer';
 
 // 定义响应式数据
 const bpmnViewer = ref(null);
 const canvas = ref(null);
 const xmlStrRef = ref('');
-const xmlId = ref(2);
+const xmlName = ref('main');
+const userName = ref(null);
+const eleID = ref();
 // 弹窗相关状态
 const taskDialogVisible = ref(false);
 const searching = ref(false);
@@ -128,71 +141,87 @@ const currentElement = ref(null);
 const resultName = ref();
 const resultSimilarity = ref();
 
+// 工具窗口相关状态
+const toolWindowVisible = ref(false);
+const toolWindowBpmnViewer = ref(null);
+const toolWindowCanvas = ref(null);
+
+// 定义栈
+const stack = ref([]);
+
 const init = async () => {
-  canvas.value = document.querySelector('.canvas');
-  bpmnViewer.value = new BpmnModeler({
-    container: canvas.value,
-    additionalModules: [
-      TokenSimulationModule,
-      ContextPadModule,
-      ModelingModule,
-    ],
-  });
+  try {
+    canvas.value = document.querySelector('.canvas');
+    bpmnViewer.value = new BpmnModeler({
+      container: canvas.value,
+      additionalModules: [
+        TokenSimulationModule,
+        ContextPadModule,
+        ModelingModule,
+      ],
+    });
 
-  await fetchXmlData(xmlId.value);
-  await createNewDiagram();
+    userName.value = sessionStorage.getItem("username");
 
-  // 正确获取 eventBus
-  const eventBus = bpmnViewer.value.get('eventBus');
+    await fetchXmlData(xmlName.value);
+    await createNewDiagram();
 
-  // 监听 TRACE_EVENT 事件
-  eventBus.on(TRACE_EVENT, async (event) => {
-    const { element, action } = event;
+    // 正确获取 eventBus
+    const eventBus = bpmnViewer.value.get('eventBus');
 
-    if (element.type === 'bpmn:Task' && action === 'enter') {
-      try {
-        const response1 = await axios.get(`/api/abnormality-calibrations/search/${element.id}`);
-        const abName = response1.data.name;
-        const response2 = await axios.get(`/api/abnormal/selectByLevel2/${abName}`);
-        const important = response2.data[0].ab_important;
+    // 监听 TRACE_EVENT 事件
+    eventBus.on(TRACE_EVENT, async (event) => {
+      const { element, action } = event;
 
-        const modeling = bpmnViewer.value.get('modeling');
+      if (element.type === 'bpmn:Task' && action === 'enter') {
+        try {
+          const response1 = await axios.get(`/api/abnormality-calibrations/search/${element.id}`);
+          const abName = response1.data.name;
+          const response2 = await axios.get(`/api/abnormal/selectByLevel2/${abName}`);
+          const important = response2.data[0].ab_important;
 
-        if (important) {
-          if (important === '二级') {
-            ElMessage.warning(element.businessObject.name + '存在' + abName);
-            // 半透明黄色背景和边框
-            modeling.setColor([element], {
-              fill: '#FFFFE0',  // 浅黄色
-              stroke: '#FFD700' // 金色边框
-            });
-          } else if (important === '一级') {
-            editorActions.trigger('togglePauseTokenSimulation');
-            ElMessage.error(element.businessObject.name + '存在' + abName);
-            // 浅红色背景和纯红色边框
-            modeling.setColor([element], {
-              fill: '#FFB6C1',  // 浅红色
-              stroke: '#FF0000' // 纯红边框
-            });
+          const modeling = bpmnViewer.value.get('modeling');
+
+          if (important) {
+            if (important === '二级') {
+              ElMessage.warning(element.businessObject.name + '存在' + abName);
+              // 半透明黄色背景和边框
+              modeling.setColor([element], {
+                fill: '#FFFFE0',  // 浅黄色
+                stroke: '#FFD700' // 金色边框
+              });
+            } else if (important === '一级') {
+              const editorActions = bpmnViewer.value.get('editorActions');
+              editorActions.trigger('togglePauseTokenSimulation');
+              ElMessage.error(element.businessObject.name + '存在' + abName);
+              // 浅红色背景和纯红色边框
+              modeling.setColor([element], {
+                fill: '#FFB6C1',  // 浅红色
+                stroke: '#FF0000' // 纯红边框
+              });
+            }
           }
+        } catch (error) {
+          console.error('获取异常信息时出错:', error);
         }
-      } catch (error) {
-        console.error('获取异常信息时出错:', error);
       }
-    }
-  });
+    });
 
-  // 触发模拟开启
-  const editorActions = bpmnViewer.value.get('editorActions');
-  if (editorActions) {
-    editorActions.trigger('toggleTokenSimulation');
+    // 触发模拟开启
+    const editorActions = bpmnViewer.value.get('editorActions');
+    if (editorActions) {
+      editorActions.trigger('toggleTokenSimulation');
+    }
+  } catch (error) {
+    console.error('初始化出错:', error);
   }
 };
 
 // 获取后端XML数据的方法
-const fetchXmlData = async (id) => {
+const fetchXmlData = async () => {
   try {
-    const url = `/api/bpmn-xml/findById/${id}`;
+    console.log(xmlName.value)
+    const url = `/api/bpmn-xml/findByNameAndUserName/${xmlName.value}/${userName.value}`;
     const response = await axios.get(url);
     xmlStrRef.value = response.data.data;
   } catch (error) {
@@ -224,7 +253,12 @@ const createNewDiagram = async () => {
 
 // 执行返回主页操作
 const goBackHome = () => {
-  changeXML('bpmn:Participant', '主页');
+  if (stack.value.length > 0) {
+    // 出栈操作
+    xmlName.value = stack.value.pop();
+    console.log(xmlName.value);
+  }
+  changeXML('bpmn:Task', xmlName.value);
 };
 
 // 处理鼠标滚轮事件，实现放大缩小
@@ -249,19 +283,37 @@ const getElementInformation = (event) => {
   return currentElement.value;
 };
 
-// 处理元素点击后的操作
-const handleElementClick = (elementInfo) => {
-  changeXML(elementInfo.elementType, elementInfo.elementName);
-  showTaskDialog(elementInfo.elementType, elementInfo.elementId);
-};
-
 // 处理元素点击事件
 const handleElementEvents = (event, eventType) => {
   const elementInfo = getElementInformation(event);
 
-  if (eventType === 'dblclick') {
-    handleElementClick(elementInfo);
+  if (eventType === 'contextmenu') {
+    handleElementContextmenu(elementInfo);
+  } else if (eventType === 'click') {
+    if (elementInfo.elementType === 'bpmn:Task') {
+      handleElementClick(elementInfo);
+    }
+  } else if (eventType === 'dblclick') {
+    // 入栈操作
+    if (elementInfo.elementType === 'bpmn:Task' || elementInfo.elementType === 'bpmn:Participant') {
+      stack.value.push(xmlName.value);
+      handleElementDblclick(elementInfo);
+    }
   }
+};
+
+// 处理元素双击后的操作
+const handleElementContextmenu = (elementInfo) => {
+  showTaskDialog(elementInfo.elementType, elementInfo.elementId);
+};
+
+const handleElementClick = (elementInfo) => {
+  eleID.value = elementInfo.elementId; // 先更新 eleID
+  showToolWindow();
+};
+
+const handleElementDblclick = (elementInfo) => {
+  changeXML(elementInfo.elementType, elementInfo.elementId);
 };
 
 // 添加元素点击事件监听
@@ -394,31 +446,28 @@ const handleSearch = async () => {
     });
 
     if (response.data.status === 'success') {
-      // return response.data.data.standardized;
       resultName.value = response.data.data.standardized;
       resultSimilarity.value = response.data.data.similarity;
-      console.log("标准化："+resultName.value+" "+resultSimilarity.value)
+      console.log("标准化：" + resultName.value + " " + resultSimilarity.value);
     } else {
       ElMessage.error('标准化失败: ' + response.data.message);
     }
   } catch (error) {
     ElMessage.error('请求失败: ' + error.message);
   }
-  if(resultSimilarity.value < 0.7){
+
+  if (resultSimilarity.value < 0.7) {
     ElMessage.warning('无法标准化异常，请自行输入或添加: ');
     return;
   }
 
-
   try {
     searching.value = true;
-    // console.log('搜索内容：', keyword);
     const url = `/api/abnormal/selectByLevel2/${resultName.value}`;
     const response = await axios.get(url);
     taskData.value = response.data[0];
     if (taskData.value) {
       searchKeyword.value = resultName.value;
-
       ElMessage.success('查询成功');
     } else {
       ElMessage.warning('结果不存在');
@@ -430,7 +479,6 @@ const handleSearch = async () => {
     searching.value = false;
   }
 };
-
 
 // 弹窗关闭前处理
 const handleClose = (done) => {
@@ -453,14 +501,13 @@ const showTaskDialog = async (elementType, elementId) => {
 
 // 切换XML页面
 const changeXML = async (elementType, elementName) => {
-  if (elementType === 'bpmn:Participant') {
+  if (elementType === 'bpmn:Participant' || elementType === 'bpmn:Task') {
     bpmnViewer.value.clear();
+    closeToolWindow();
+    xmlName.value = elementName;
     try {
-      xmlStrComp(elementName);
-      await fetchXmlData(xmlId.value);
+      await fetchXmlData();
       const result = await bpmnViewer.value.importXML(xmlStrRef.value);
-      const { warnings } = result;
-      console.log(warnings);
 
       const canvasInstance = bpmnViewer.value.get('canvas');
       canvasInstance.zoom('fit-viewport', true);
@@ -470,19 +517,60 @@ const changeXML = async (elementType, elementName) => {
   }
 };
 
-// xmlStr的相关匹配
-const xmlStrComp = (elementName) => {
-  const xmlIdMap = {
-    '交互定制': 7,
-    '研发创新': 3,
-    '精准营销': 8,
-    '协同采购': 1,
-    '智能生产': 5,
-    '智慧物流': 4,
-    '智慧服务': 6,
-    '主页': 2
-  };
-  xmlId.value = xmlIdMap[elementName] || xmlId.value;
+// 显示工具窗口
+const showToolWindow = async () => {
+  if (toolWindowVisible.value) {
+    closeToolWindow();
+  }
+  toolWindowVisible.value = true;
+  await initToolWindowBpmnViewer();
+};
+
+// 修改工具窗口初始化方法
+const initToolWindowBpmnViewer = async () => {
+  try {
+    // 销毁旧实例
+    if (toolWindowBpmnViewer.value) {
+      toolWindowBpmnViewer.value.destroy();
+      toolWindowBpmnViewer.value = null;
+    }
+    toolWindowCanvas.value = document.querySelector('.tool-window-canvas');
+    toolWindowBpmnViewer.value = new BpmnViewer({
+      container: toolWindowCanvas.value,
+    });
+
+    //获取组件的侵入下层视图
+    try {
+      const url = `/api/bpmn-xml/findByNameAndUserName/${eleID.value}/${userName.value}`;
+      const response = await axios.get(url);
+      // 假设后端返回的XML数据在响应的data字段中
+      xmlStrRef.value = response.data.data;
+    } catch (error) {
+      const url = `/api/bpmn-xml/findByNameAndUserName/default/default`;
+      const response = await axios.get(url);
+      // 假设后端返回的XML数据在响应的data字段中
+      xmlStrRef.value = response.data.data;
+      console.error('获取XML数据时出错:', error);
+    }
+
+    // 获取当前流程的XML
+    const result = await toolWindowBpmnViewer.value.importXML(xmlStrRef.value);
+
+    const canvasInstance = toolWindowBpmnViewer.value.get('canvas');
+    canvasInstance.zoom('fit-viewport', true);
+  } catch (error) {
+    console.error('初始化工具窗口出错:', error);
+  }
+};
+
+// 添加关闭工具窗口方法
+const closeToolWindow = () => {
+  toolWindowVisible.value = false;
+  // 销毁实例
+  if (toolWindowBpmnViewer.value) {
+    toolWindowBpmnViewer.value.destroy();
+    toolWindowBpmnViewer.value = null;
+  }
 };
 
 // 挂载时调用初始化方法
@@ -507,23 +595,28 @@ onMounted(init);
 }
 
 .back-home-button {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  z-index: 10;
-  padding: 0;
+  position: fixed;
+  top: 70px; /* 调整顶部距离 */
+  left: 210px; /* 调整右侧距离，这里使用 right 表示从右侧开始计算偏移 */
+  z-index: 1000;
+  padding: 12px;
+  background: #409eff;
   border: none;
-  background: none;
-  transition: transform 0.3s ease; /* 添加按钮悬停动画 */
+  border-radius: 50%;
+  box-shadow: 0 2px 12px 0 rgba(64, 158, 255, 0.3);
+  transition: all 0.3s ease;
 }
 
 .back-home-button:hover {
-  transform: scale(1.1); /* 悬停时按钮放大 */
+  background: #79bbff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px 0 rgba(64, 158, 255, 0.5);
 }
 
 .arrow-icon {
-  font-size: 16px;
-  color: rgba(0, 0, 139, 1);
+  color: white;
+  font-size: 24px;
+  transition: color 0.3s ease;
 }
 
 .random-btn {
@@ -659,5 +752,46 @@ onMounted(init);
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
+}
+
+/* 修改工具窗口样式 */
+.tool-window {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 300px;
+  background: white;
+  border-top: 2px solid #ebeef5;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-window-header {
+  padding: 8px 16px;
+  background: #f5f7fa;
+  border-bottom: 1px solid #e4e7ed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-icon {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.close-icon:hover {
+  background: #f56c6c;
+  color: white;
+}
+
+.tool-window-canvas {
+  flex: 1;
+  height: calc(100% - 40px);
 }
 </style>

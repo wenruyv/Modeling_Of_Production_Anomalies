@@ -1,5 +1,12 @@
 <template>
-  <div class="heading">生产信息</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><Document /></el-icon>
+      <span>生产信息</span>
+    </div>
+    <div class="operation-area">
+    </div>
+  </div>
   <div>
     <el-tabs
         v-model="activeTabName"
@@ -40,9 +47,11 @@
 
 <script>
 import { getCurrentInstance, onMounted, ref, computed } from 'vue';
-import { Edit } from '@element-plus/icons-vue';
+import {Edit, Document, OfficeBuilding} from '@element-plus/icons-vue';
+
 
 export default {
+  components: {Edit,Document,OfficeBuilding},
   name: "ProductionInfoTree",
   setup() {
     const { proxy } = getCurrentInstance();
@@ -119,12 +128,6 @@ export default {
 </script>
 
 <style>
-.heading {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
 .carousel-item {
   padding: 20px;
   width: 100%;

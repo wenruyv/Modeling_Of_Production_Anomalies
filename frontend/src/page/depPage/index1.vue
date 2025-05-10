@@ -1,9 +1,13 @@
 <template>
-
-  <div class="heading">首页</div>
-  <div >欢迎访问 {{ dep.department }} 首页。</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><Menu /></el-icon>
+      <span>首页</span>
+    </div>
+  </div>
+  <div >欢迎访问 {{dep.com_name}} {{ dep.department }} 首页。</div>
   <div class="tips">
-    <div >部门简介：{{dep.introduction}}</div>
+    <div >部门简介：{{dep.description}}</div>
 
   </div>
 
@@ -12,17 +16,23 @@
 <script>
 
 import {getCurrentInstance, onMounted, reactive} from "vue";
+import {Menu} from "@element-plus/icons-vue";
 
 export default{
+  components:{Menu},
   setup(){
+
     const { proxy } = getCurrentInstance();
     // 公司信息
     const dep = reactive({
       department: '',
       d_username: '',
       d_password: '',
+      d_name:'',
       location: '',
-      introduction: '',
+      description: '',
+      com_id:'',
+      com_name:'',
     });
     // 加载部门名称
     const loadDepInfo = async () => {

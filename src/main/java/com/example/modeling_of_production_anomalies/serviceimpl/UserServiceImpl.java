@@ -16,14 +16,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username) {
         User user = userMapper.findByUsername(username);
-//        if (user == null) {
-//            // 处理未找到用户的情况
-//            System.out.println("service用户不存在");
-//        } else {
-//            System.out.println("service找到的用户：" + user);
-//        }
         return user;
     }
+
+    @Override
+    public User findByUserId(int user_id) {
+        return userMapper.findByUserId(user_id);
+    }
+
     @Override
     public List<User> UserList() {
         List<User> list = userMapper.UserList();

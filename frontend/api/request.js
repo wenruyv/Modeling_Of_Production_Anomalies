@@ -33,6 +33,18 @@ const request = class{
 			})
         })
     }
+    // delete (新增)
+    modedelete() {
+        return new Promise((resolve, reject) => {
+            instance.delete(this.url)
+                .then(res => {
+                    resolve(res)
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })
+    }
 }
 
 export default request

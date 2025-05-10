@@ -44,7 +44,7 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-<!--        MyBatis-->
+        <!--        MyBatis-->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
@@ -59,7 +59,7 @@
             <version>3.0.0</version>
         </dependency>
 
-        <!--knife4j-->
+        <!--knife-->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-ui</artifactId>

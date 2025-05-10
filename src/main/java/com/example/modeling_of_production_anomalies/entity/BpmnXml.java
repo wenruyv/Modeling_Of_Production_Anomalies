@@ -8,4 +8,5 @@ public class BpmnXml {
     private Long id;
     private String name;
     private String data;
+    private String userName;
 }
