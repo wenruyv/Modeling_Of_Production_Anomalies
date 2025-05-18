@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.EquipmentMapper">
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.Equipment">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="number" jdbcType="VARCHAR" property="number"/>
+        <result column="buy_date" jdbcType="VARCHAR" property="buy_date"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="warranty_period" jdbcType="VARCHAR" property="warranty_period"/>
+        <result column="use_life" jdbcType="VARCHAR" property="use_life"/>
+        <result column="group_id" jdbcType="INTEGER" property="group_id"/>
+        <result column="group_name" jdbcType="VARCHAR" property="group_name"/>
+        <result column="dep_id" jdbcType="INTEGER" property="dep_id"/>
+        <result column="dep_name" jdbcType="VARCHAR" property="dep_name"/>
+        <result column="com_id" jdbcType="INTEGER" property="com_id"/>
+        <result column="com_name" jdbcType="VARCHAR" property="com_name"/>
+    </resultMap>
+    <select id="equipmentList" resultMap="BaseResultMap">
+        select * from equipment where com_id = #{com_id}
+    </select>
+    <select id="equipmentByDepId" resultMap="BaseResultMap">
+        select * from equipment where dep_id = #{dep_id}
+    </select>
+    <insert id="addEquipment">
+        insert into equipment (id,name,type,number,buy_date,description,warranty_period,use_life,group_id,group_name,dep_id,dep_name,com_id,com_name)
+        values (#{id},#{name},#{type},#{number},#{buy_date},#{description},#{warranty_period},#{use_life},#{group_id},#{group_name},#{dep_id},#{dep_name},#{com_id},#{com_name})
+    </insert>
+    <update id="updateEquipment">
+        UPDATE equipment
+        SET name = #{name},
+            type = #{type},
+            number = #{number},
+            buy_date = #{buy_date},
+            description = #{description},
+            warranty_period = #{warranty_period},
+            use_life = #{use_life},
+            group_id = #{group_id},
+            group_name = #{group_name}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteById">
+        delete from equipment where id = #{id}
+    </delete>
+    <delete id="deleteByDepId">
+        delete from equipment where dep_id = #{dep_id}
+    </delete>
+    <delete id="deleteByComId">
+        delete from equipment where com_id = #{com_id}
+    </delete>
+</mapper>

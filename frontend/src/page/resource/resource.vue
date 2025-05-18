@@ -1,5 +1,12 @@
 <template>
-  <div class="heading">生产资源结构图</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><Box /></el-icon>
+      <span>生产资源结构图</span>
+    </div>
+    <div class="operation-area">
+    </div>
+  </div>
   <div style="height: 520px; width: 100%;">
     <el-tabs type="border-card">
       <el-tab-pane
@@ -9,7 +16,7 @@
       <vue3-tree-org
           :data="resource"
           center
-          default-expand-level="1"
+          default-expand-level="2"
           :horizontal="false"
           :collapsable="true"
           :only-one-node="false"
@@ -28,14 +35,14 @@
 </template>
 
 <script>
-import { ElSwitch, ElColorPicker } from 'element-plus'
+import { ElSwitch, ElColorPicker} from 'element-plus'
 import {getCurrentInstance, onMounted, ref} from 'vue'
-
+import { Box} from '@element-plus/icons-vue';
 export default {
   name: "baseTree",
   components: {
     ElSwitch,
-    ElColorPicker,
+    ElColorPicker,Box
 
   },
   setup() {

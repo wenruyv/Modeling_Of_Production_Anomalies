@@ -65,13 +65,12 @@
 </template>
 
 <script>
-import {OfficeBuilding, Menu, User, Document} from '@element-plus/icons-vue';
+
 import { useRouter, useRoute } from 'vue-router';
 import { ref, watch, onMounted } from 'vue';
-
+import { OfficeBuilding, Menu,User,Document,Box } from '@element-plus/icons-vue';
 export default {
-
-
+components:{OfficeBuilding, Menu,User,Document},
   setup() {
     const router = useRouter();
     const route = useRoute();
@@ -108,17 +107,53 @@ export default {
       },
       {
         id: '5',
+        icon: Box,
+        title: '生产资源',
+        router: '',
+        Subclass: [
+            {
+              id: '5.1',
+              title: '原材料',
+              router: 'comMaterial',
+            },
+            {
+              id: '5.2',
+              title: '生产设备',
+              router: 'comEquipment',
+            },
+        ], // 是否有二级菜单
+      },
+      {
+        id: '6',
         icon: OfficeBuilding,
         title: '部门管理',
         router: 'departmentList',
         Subclass: [], // 是否有二级菜单
       },
       {
-        id: '6',
+        id: '7',
         icon: User,
         title: '人员管理',
         router: 'peopleList',
         Subclass: [], // 是否有二级菜单
+      },
+      {
+        id: '8',
+        icon: WarningFilled,
+        title: '异常建模',
+        router: '',
+        Subclass: [
+          {
+            id: '8.1',
+            title: '流程查看器',
+            router: 'companyBpmn-viewer',
+          },
+          {
+            id: '8.2',
+            title: '流程建模器',
+            router: 'companyBpmn-modeler',
+          },
+        ],
       },
 
     ];
@@ -126,36 +161,70 @@ export default {
     // 初始化面包屑
     const breadcrumbItems = ref(['首页']);
 
-    // 从 localStorage 中读取面包屑
-    const loadBreadcrumb = () => {
-      const savedBreadcrumb = localStorage.getItem('breadcrumb');
-      if (savedBreadcrumb) {
-        breadcrumbItems.value = JSON.parse(savedBreadcrumb);
-      } else {
-        // 如果 localStorage 中没有保存的面包屑，则根据当前路由初始化面包屑
-        updateBreadcrumbFromRoute();
+    // 根据路由路径获取对应的菜单项
+    const getMenuItemByPath = (path) => {
+      // 处理路径，去掉前导斜杠
+      const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+
+      // 先检查一级菜单
+      const mainMenuItem = menu.find(item => item.router === normalizedPath);
+      if (mainMenuItem) {
+        return {
+          item: mainMenuItem,
+          parent: null
+        };
       }
+
+      // 检查二级菜单
+      for (const parentItem of menu) {
+        if (parentItem.Subclass && parentItem.Subclass.length > 0) {
+          const subItem = parentItem.Subclass.find(sub => sub.router === normalizedPath);
+          if (subItem) {
+            return {
+              item: subItem,
+              parent: parentItem
+            };
+          }
+        }
+      }
+
+      // 如果没有找到匹配项，不返回默认菜单，而是保持当前面包屑
+      return null;
     };
 
     // 保存面包屑到 localStorage
     const saveBreadcrumb = () => {
-      localStorage.setItem('breadcrumb', JSON.stringify(breadcrumbItems.value));
+      localStorage.setItem('com_breadcrumb', JSON.stringify(breadcrumbItems.value));
+      // 同时保存当前路径，用于刷新页面时恢复
+      localStorage.setItem('com_currentPath', route.path);
     };
 
     // 根据当前路由更新面包屑
     const updateBreadcrumbFromRoute = () => {
-      const currentMenu = menu.find((item) => item.router === route.path);
-      if (currentMenu) {
-        breadcrumbItems.value = [currentMenu.title];
-      } else {
-        const subMenu = menu.find((item) =>
-            item.Subclass.some((sub) => sub.router === route.path)
-        );
-        if (subMenu) {
-          const subItem = subMenu.Subclass.find((sub) => sub.router === route.path);
-          breadcrumbItems.value = [subMenu.title, subItem.title];
+      const result = getMenuItemByPath(route.path);
+
+      // 如果找不到匹配项，保持当前面包屑不变
+      if (!result) {
+        // 检查是否有保存的面包屑
+        const savedBreadcrumb = localStorage.getItem('com_breadcrumb');
+        if (savedBreadcrumb) {
+          breadcrumbItems.value = JSON.parse(savedBreadcrumb);
+          return; // 保持当前面包屑，不进行更新
         }
+        // 如果没有保存的面包屑，使用默认值
+        return;
       }
+
+      const { item, parent } = result;
+
+      if (parent) {
+        // 如果是二级菜单
+        breadcrumbItems.value = [parent.title, item.title];
+      } else {
+        // 如果是一级菜单
+        breadcrumbItems.value = [item.title];
+      }
+
       // 保存面包屑
       saveBreadcrumb();
     };
@@ -166,31 +235,93 @@ export default {
         // 如果是父菜单，不更新面包屑
         return;
       }
-      // 更新面包屑
-      updateBreadcrumb(menuItem);
-      // 保存面包屑
-      saveBreadcrumb();
-    };
 
-    // 更新面包屑
-    const updateBreadcrumb = (menuItem) => {
+      // 更新面包屑
       const parentMenu = menu.find((item) =>
-          item.Subclass.some((sub) => sub.id === menuItem.id)
+          item.Subclass && item.Subclass.some((sub) => sub.id === menuItem.id)
       );
+
       if (parentMenu) {
         breadcrumbItems.value = [parentMenu.title, menuItem.title];
       } else {
         breadcrumbItems.value = [menuItem.title];
       }
+
+      // 保存面包屑
+      saveBreadcrumb();
+    };
+
+    // 从 localStorage 中读取面包屑
+    const loadBreadcrumb = () => {
+      const savedBreadcrumb = localStorage.getItem('com_breadcrumb');
+      const savedPath = localStorage.getItem('com_currentPath');
+
+      // 设置一个标志，表示是否已经从本地存储加载了面包屑
+      let breadcrumbLoaded = false;
+
+      if (savedBreadcrumb && savedPath) {
+        // 如果有保存的面包屑和路径
+        try {
+          const parsedBreadcrumb = JSON.parse(savedBreadcrumb);
+          if (Array.isArray(parsedBreadcrumb) && parsedBreadcrumb.length > 0) {
+            breadcrumbItems.value = parsedBreadcrumb;
+            breadcrumbLoaded = true;
+
+            // 如果当前路径与保存的路径不同，需要更新面包屑
+            // 但不要强制更新，而是保持当前面包屑
+            if (route.path !== savedPath) {
+              // 将当前路径保存，但不更新面包屑
+              localStorage.setItem('com_currentPath', route.path);
+            }
+          }
+        } catch (e) {
+          console.error('Failed to parse breadcrumb:', e);
+        }
+      }
+
+      // 只有在没有成功加载面包屑的情况下，才根据路由初始化
+      if (!breadcrumbLoaded) {
+        // 尝试根据当前路由更新面包屑，但不要强制更新
+        const result = getMenuItemByPath(route.path);
+        if (result) {
+          const { item, parent } = result;
+          if (parent) {
+            breadcrumbItems.value = [parent.title, item.title];
+          } else {
+            breadcrumbItems.value = [item.title];
+          }
+          saveBreadcrumb();
+        }
+      }
     };
 
     // 监听路由变化
     watch(
-        () => route.path,
-        () => {
-          updateBreadcrumbFromRoute();
-        },
-        { immediate: true }
+      () => route.path,
+      (newPath) => {
+        // 只有当路由真正变化时才更新面包屑
+        const currentPath = localStorage.getItem('com_currentPath');
+
+        // 如果路径变化了，先保存当前路径
+        if (newPath !== currentPath) {
+          localStorage.setItem('com_currentPath', newPath);
+
+          // 检查是否是通过菜单点击导致的路由变化
+          // 如果是菜单点击，面包屑已经在handleMenuClick中更新
+          // 如果不是，才需要根据路由更新面包屑
+          const result = getMenuItemByPath(newPath);
+          if (result) {
+            const { item, parent } = result;
+            if (parent) {
+              breadcrumbItems.value = [parent.title, item.title];
+            } else {
+              breadcrumbItems.value = [item.title];
+            }
+            saveBreadcrumb();
+          }
+          // 如果没有找到匹配项，保持当前面包屑不变
+        }
+      }
     );
 
     // 页面加载时从 localStorage 中读取面包屑

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.modeling_of_production_anomalies.mapper.OrgAllMapper">
+    <resultMap id="BaseResultMap" type="com.example.modeling_of_production_anomalies.entity.OrgAll">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="com_type" jdbcType="VARCHAR" property="com_type"/>
+        <result column="size" jdbcType="VARCHAR" property="size"/>
+        <result column="info" jdbcType="LONGVARCHAR" property="info"/>
+    </resultMap>
+    <select id="orgAllList" resultMap="BaseResultMap">
+        select * from org_all
+    </select>
+    <select id="findById" resultMap="BaseResultMap">
+        select * from org_all where id = #{id}
+    </select>
+    <select id="findType">
+        select distinct com_type from org_all
+    </select>
+    <select id="findInfo" resultMap="BaseResultMap">
+        select * from org_all where com_type = #{com_type} and size = #{size}
+    </select>
+    <insert id="addOrgAll">
+        insert into org_all (id,com_type,size,info)
+        values (#{id},#{com_type},#{size},#{info})
+    </insert>
+    <update id="updateOrgAll">
+        update org_all
+        set info = #{info}
+        where id = #{id}
+    </update>
+    <!-- OrgAll.xml -->
+    <insert id="batchInsert" parameterType="list">
+        INSERT INTO org_all (com_type, size, info)
+        VALUES
+        <foreach collection="orgList" item="org" separator=",">
+            (#{org.com_type}, #{org.size}, #{org.info})
+        </foreach>
+    </insert>
+</mapper>

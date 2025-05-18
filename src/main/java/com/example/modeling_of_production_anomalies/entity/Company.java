@@ -6,6 +6,7 @@ public class Company {
     private String location;
     private String established_date;
     private String type;
+    private String size;
     private String phone;
     private String email;
     private String ceo_name;
@@ -14,6 +15,14 @@ public class Company {
     private String c_password;
     private String introduction;
     private String c_org;
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
 
     public int getId() {
         return id;
@@ -127,6 +136,7 @@ public class Company {
                 ", location='" + location + '\'' +
                 ", established_date='" + established_date + '\'' +
                 ", type='" + type + '\'' +
+                ", size='" + size + '\'' +
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", ceo_name='" + ceo_name + '\'' +
@@ -134,6 +144,7 @@ public class Company {
                 ", c_username='" + c_username + '\'' +
                 ", c_password='" + c_password + '\'' +
                 ", introduction='" + introduction + '\'' +
+                ", c_org='" + c_org + '\'' +
                 '}';
     }
 }

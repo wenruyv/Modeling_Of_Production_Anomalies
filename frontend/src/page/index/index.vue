@@ -93,7 +93,7 @@ export default {
           {
             id: '2.1',
             title: '生产组织',
-            router: 'org',
+            router: 'orgAll',
           },
           {
             id: '2.2',
@@ -144,36 +144,56 @@ export default {
     // 初始化面包屑
     const breadcrumbItems = ref(['账户管理']);
 
-    // 从 localStorage 中读取面包屑
-    const loadBreadcrumb = () => {
-      const savedBreadcrumb = localStorage.getItem('breadcrumb');
-      if (savedBreadcrumb) {
-        breadcrumbItems.value = JSON.parse(savedBreadcrumb);
-      } else {
-        // 如果 localStorage 中没有保存的面包屑，则根据当前路由初始化面包屑
-        updateBreadcrumbFromRoute();
+    // 根据路由路径获取对应的菜单项
+    const getMenuItemByPath = (path) => {
+      // 先检查一级菜单
+      const mainMenuItem = menu.find(item => item.router === path.slice(1));
+      if (mainMenuItem) {
+        return {
+          item: mainMenuItem,
+          parent: null
+        };
       }
+
+      // 检查二级菜单
+      for (const parentItem of menu) {
+        if (parentItem.Subclass && parentItem.Subclass.length > 0) {
+          const subItem = parentItem.Subclass.find(sub => sub.router === path.slice(1));
+          if (subItem) {
+            return {
+              item: subItem,
+              parent: parentItem
+            };
+          }
+        }
+      }
+
+      // 如果没有找到匹配项，返回默认菜单
+      return {
+        item: menu[0],
+        parent: null
+      };
     };
 
     // 保存面包屑到 localStorage
     const saveBreadcrumb = () => {
       localStorage.setItem('breadcrumb', JSON.stringify(breadcrumbItems.value));
+      // 同时保存当前路径，用于刷新页面时恢复
+      localStorage.setItem('currentPath', route.path);
     };
 
     // 根据当前路由更新面包屑
     const updateBreadcrumbFromRoute = () => {
-      const currentMenu = menu.find((item) => item.router === route.path);
-      if (currentMenu) {
-        breadcrumbItems.value = [currentMenu.title];
+      const { item, parent } = getMenuItemByPath(route.path);
+
+      if (parent) {
+        // 如果是二级菜单
+        breadcrumbItems.value = [parent.title, item.title];
       } else {
-        const subMenu = menu.find((item) =>
-            item.Subclass.some((sub) => sub.router === route.path)
-        );
-        if (subMenu) {
-          const subItem = subMenu.Subclass.find((sub) => sub.router === route.path);
-          breadcrumbItems.value = [subMenu.title, subItem.title];
-        }
+        // 如果是一级菜单
+        breadcrumbItems.value = [item.title];
       }
+
       // 保存面包屑
       saveBreadcrumb();
     };
@@ -184,31 +204,51 @@ export default {
         // 如果是父菜单，不更新面包屑
         return;
       }
-      // 更新面包屑
-      updateBreadcrumb(menuItem);
-      // 保存面包屑
-      saveBreadcrumb();
-    };
 
-    // 更新面包屑
-    const updateBreadcrumb = (menuItem) => {
-      const parentMenu = menu.find((item) =>
-          item.Subclass.some((sub) => sub.id === menuItem.id)
+      // 更新面包屑
+      const parentMenu = menu.find(item =>
+        item.Subclass && item.Subclass.some(sub => sub.id === menuItem.id)
       );
+
       if (parentMenu) {
         breadcrumbItems.value = [parentMenu.title, menuItem.title];
       } else {
         breadcrumbItems.value = [menuItem.title];
       }
+
+      // 保存面包屑
+      saveBreadcrumb();
+    };
+
+    // 从 localStorage 中读取面包屑
+    const loadBreadcrumb = () => {
+      const savedBreadcrumb = localStorage.getItem('breadcrumb');
+      const savedPath = localStorage.getItem('currentPath');
+
+      if (savedBreadcrumb && savedPath) {
+        // 如果有保存的面包屑和路径
+        breadcrumbItems.value = JSON.parse(savedBreadcrumb);
+
+        // 如果当前路径与保存的路径不同，需要更新面包屑
+        if (route.path !== savedPath) {
+          updateBreadcrumbFromRoute();
+        }
+      } else {
+        // 如果没有保存的面包屑，则根据当前路由初始化面包屑
+        updateBreadcrumbFromRoute();
+      }
     };
 
     // 监听路由变化
     watch(
-        () => route.path,
-        () => {
+      () => route.path,
+      (newPath) => {
+        // 只有当路由真正变化时才更新面包屑
+        const currentPath = localStorage.getItem('currentPath');
+        if (newPath !== currentPath) {
           updateBreadcrumbFromRoute();
-        },
-        { immediate: true }
+        }
+      }
     );
 
     // 页面加载时从 localStorage 中读取面包屑

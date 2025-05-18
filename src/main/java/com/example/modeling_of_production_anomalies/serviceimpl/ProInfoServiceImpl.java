@@ -17,6 +17,11 @@ public class ProInfoServiceImpl implements ProInfoService {
     }
 
     @Override
+    public ProInfo findInfoById(int id) {
+        return proInfoMapper.findInfoById(id);
+    }
+
+    @Override
     public List<ProInfo> proInfoList() {
         return proInfoMapper.proInfoList();
     }
@@ -29,5 +34,15 @@ public class ProInfoServiceImpl implements ProInfoService {
     @Override
     public int updateProInfo(ProInfo proInfo) {
         return proInfoMapper.updateProInfo(proInfo);
+    }
+
+    @Override
+    public int deleteProInfo(int id) {
+        return proInfoMapper.deleteProInfo(id);
+    }
+
+    @Override
+    public int deleteByComId(int c_id) {
+        return proInfoMapper.deleteByComId(c_id);
     }
 }

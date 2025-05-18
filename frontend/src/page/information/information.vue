@@ -1,14 +1,21 @@
 <template>
-  <div class="heading">生产信息</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><Document /></el-icon>
+      <span>生产信息</span>
+    </div>
+    <div class="operation-area">
+    </div>
+  </div>
   <div>
     <el-tabs
         v-model="activeTabName"
         type="border-card">
       <el-tab-pane
           v-for="tab in groupedInformation"
-          :key="tab.name"
-          :label="tab.name"
-          :name="tab.name"
+          :key="tab.c_name"
+          :label="tab.c_name"
+          :name="tab.c_name"
       >
         <el-carousel
             :autoplay="false"
@@ -17,7 +24,7 @@
             arrow="always">
           <el-carousel-item v-for="(item, index) in tab.items" :key="index">
             <div class="carousel-item">
-              <div class="company-name">{{ item.c_name }}</div>
+<!--              <div class="company-name">{{ item.c_name }}</div>-->
               <vue3-tree-org
                   :data="item.info"
                   center
@@ -40,9 +47,11 @@
 
 <script>
 import { getCurrentInstance, onMounted, ref, computed } from 'vue';
-import { Edit } from '@element-plus/icons-vue';
+import {Edit, Document, OfficeBuilding} from '@element-plus/icons-vue';
+
 
 export default {
+  components: {Edit,Document,OfficeBuilding},
   name: "ProductionInfoTree",
   setup() {
     const { proxy } = getCurrentInstance();
@@ -54,13 +63,13 @@ export default {
     const groupedInformation = computed(() => {
       const groups = {};
       information.value.forEach(item => {
-        if (!groups[item.name]) {
-          groups[item.name] = {
-            name: item.name,
+        if (!groups[item.c_name]) {
+          groups[item.c_name] = {
+            c_name: item.c_name,
             items: []
           };
         }
-        groups[item.name].items.push(item);
+        groups[item.c_name].items.push(item);
       });
       return Object.values(groups);
     });
@@ -84,7 +93,7 @@ export default {
           }));
           // 设置第一个标签页为第一个分组的名称
           if (groupedInformation.value.length > 0) {
-            activeTabName.value = groupedInformation.value[0].name;
+            activeTabName.value = groupedInformation.value[0].c_name;
           }
         }
       } catch (error) {
@@ -119,12 +128,6 @@ export default {
 </script>
 
 <style>
-.heading {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
 .carousel-item {
   padding: 20px;
   width: 100%;

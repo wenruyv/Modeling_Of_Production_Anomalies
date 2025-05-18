@@ -1,12 +1,30 @@
 
 
 .heading {
-
-	font-size: 20px;
+	font-size: 22px;
 	font-weight: bold;
-	margin-bottom: 20px;
-
+	display: flex;
+	align-items: center;
+	color: #303133;
 }
+
+.heading .el-icon {
+	margin-right: 8px;
+	font-size: 24px;
+	color: #409EFF;
+}
+.page-header {
+	height: 48px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+.operation-area {
+	display: flex;
+	gap: 15px;
+}
+
 /*index通用样式*/
 .title1{
 	position: fixed; /* 固定在顶部 */
@@ -88,7 +106,7 @@
 	margin: 20px auto;
 	padding: 24px;
 	background: #f5f7fa;
-	min-height: calc(100vh - 40px);
+
 }
 
 /* 操作按钮区域优化 */

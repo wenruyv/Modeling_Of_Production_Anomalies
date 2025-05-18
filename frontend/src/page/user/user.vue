@@ -1,130 +1,177 @@
 <template>
   <div class="container">
-    <!-- 操作按钮 -->
-    <div style="margin-bottom: 10px;">
-      <div class="heading">账户管理
-        <el-button @click="openAddDialog" type="primary" style="width: 80px;float: right;" >新增</el-button></div>
-
+    <!-- 页面标题和操作区 -->
+    <div class="page-header">
+      <div class="heading">
+        <el-icon><User /></el-icon>
+        <span>账户管理</span>
+      </div>
     </div>
-    <div class="table-container">
-      <el-card class="box-card">
+
+    <!-- 表格区域 -->
+    <div class="main-content">
+      <el-card class="table-container" shadow="hover">
         <!-- 表格组件 -->
-        <el-table :data="paginatedData" stripe style="width: 100%">
-          <el-table-column prop="user_id" label="id" min-width="100">
+        <el-table
+          :data="paginatedData"
+          stripe
+          style="width: 100%"
+          @sort-change="handleSortChange"
+          v-loading="tableLoading"
+          row-key="user_id"
+          :header-cell-style="{backgroundColor: '#f5f7fa'}"
+          highlight-current-row
+        >
+          <el-table-column prop="username" label="用户名" min-width="120" show-overflow-tooltip>
             <template #default="scope">
-              <div class="scrollable-cell" :title="scope.row.user_id">{{ scope.row.user_id }}</div>
+              <div class="username-cell">
+                <el-icon><Avatar /></el-icon>
+                <span>{{ scope.row.username }}</span>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column prop="username" label="用户名" min-width="100">
+
+          <el-table-column label="密码" min-width="120" show-overflow-tooltip>
             <template #default="scope">
-              <div class="scrollable-cell" :title="scope.row.username">{{ scope.row.username }}</div>
+              <div class="password-cell">
+                <el-tag type="info">******</el-tag>
+                <el-button link type="primary" size="small" @click.stop="showPassword(scope.row)">
+                  <el-icon><View /></el-icon>
+                </el-button>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column prop="password" label="密码" min-width="100">
+
+          <el-table-column
+            prop="user_type"
+            label="用户类型"
+            min-width="120"
+            sortable
+            :sort-orders="['ascending', 'descending']"
+          >
             <template #default="scope">
-              <div class="scrollable-cell" :title="scope.row.password">{{ scope.row.password }}</div>
+              <el-tag :type="getUserTypeTagType(scope.row.user_type)">
+                {{ formatUserType(scope.row.user_type) }}
+              </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="user_type" label="用户类型" min-width="100" :formatter="tableUserTypeFormatter">
-          </el-table-column>
+
           <!-- 操作列 -->
-          <el-table-column label="操作" min-width="120">
+          <el-table-column v-if="false" label="操作" fixed="right" width="150">
             <template #default="scope">
-              <el-button size="small" @click="openEditDialog(scope.row)">修改</el-button>
-              <el-button size="small" type="danger" @click="deleteRow(scope.row.user_id)">删除</el-button>
+              <el-button size="small" type="primary" @click.stop="openEditDialog(scope.row)">
+                <el-icon><Edit /></el-icon>修改
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
+
         <!-- 分页组件 -->
-        <el-pagination
+        <div class="pagination-container">
+          <el-pagination
             background
-            layout="prev, pager, next"
+            layout="total, prev, pager, next, jumper"
             :total="user_data.total"
             :current-page="user_data.page"
             :page-size="user_data.pageSize"
             @current-change="currentChange"
-
-        />
+            :hide-on-single-page="false"
+          />
+        </div>
       </el-card>
     </div>
 
-    <!-- 新增对话框 -->
-    <el-dialog v-model="addDialogVisible" title="新增记录">
-      <el-form :model="newRecord" label-width="120px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="用户名">
-              <el-input v-model="newRecord.username" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="密码">
-              <el-input v-model="newRecord.password"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="用户类型">
-              <el-select v-model="newRecord.user_type" placeholder="请选择">
-                <el-option label="系统管理员" value="1" />
 
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-    <span class="dialog-footer">
-      <el-button @click="addDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="addRow">确定</el-button>
-    </span>
-      </template>
-    </el-dialog>
 
     <!-- 修改对话框 -->
-    <el-dialog v-model="editDialogVisible" title="修改记录">
-      <el-form :model="editRecord" label-width="120px">
-        <el-row>
+    <el-dialog
+      v-model="editDialogVisible"
+      title="修改用户信息"
+      width="50%"
+      destroy-on-close
+    >
+      <el-form
+        :model="editRecord"
+        :rules="formRules"
+        ref="editFormRef"
+        label-width="120px"
+        class="user-form"
+        status-icon
+      >
+        <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="id">
+            <el-form-item label="用户ID">
               <el-input v-model="editRecord.user_id" disabled/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="用户类型">
-              <el-input :value="formatUserType(editRecord.user_type)" disabled />
+              <el-tag :type="getUserTypeTagType(editRecord.user_type)" size="large">
+                {{ formatUserType(editRecord.user_type) }}
+              </el-tag>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="用户名">
-              <el-input v-model="editRecord.username" />
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="editRecord.username" placeholder="请输入用户名" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="密码">
-              <el-input v-model="editRecord.password"/>
+            <el-form-item label="密码" prop="password">
+              <el-input
+                v-model="editRecord.password"
+                placeholder="请输入密码"
+                show-password
+              />
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <template #footer>
-        <span class="dialog-footer">
+        <div class="dialog-footer">
           <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="updateRow">确定</el-button>
-        </span>
+          <el-button type="primary" @click="updateRow" :loading="submitLoading">确定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 密码查看弹窗 -->
+    <el-dialog
+      v-model="passwordDialogVisible"
+      title="用户密码"
+      width="30%"
+      destroy-on-close
+    >
+      <div class="password-display">
+        <p>{{ selectedUser.password }}</p>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="passwordDialogVisible = false">关闭</el-button>
+        </div>
       </template>
     </el-dialog>
   </div>
 </template>
 <script setup>
 import {reactive, onMounted, computed, ref, getCurrentInstance} from 'vue';
-import { ElDialog, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus'
+import {
+  User, View, Edit, Avatar, Hide
+} from '@element-plus/icons-vue';
+import { ElDialog, ElForm, ElFormItem, ElInput, ElButton, ElMessageBox } from 'element-plus'
 import axios from 'axios';
 
 const {proxy} = getCurrentInstance()
+
+// 响应式状态
+const tableLoading = ref(false);
+const submitLoading = ref(false);
+const passwordDialogVisible = ref(false);
+const selectedUser = ref({});
+const editFormRef = ref(null);
+
 // 定义响应式数据
 const user_data = reactive({
   user_array: [],//数据
@@ -133,14 +180,13 @@ const user_data = reactive({
   pageSize: 10, // 每页条数
 })
 
-// 新增对话框相关
-const addDialogVisible = ref(false);
-const newRecord = reactive({
-  user_id: '',
-  username: '',
-  password: '',
-  user_type: '',
-});
+// 表单验证规则
+const formRules = {
+  username: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
+  password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
+};
+
+
 
 // 修改对话框相关
 const editDialogVisible = ref(false);
@@ -159,22 +205,73 @@ function formatUserType(value) {
     default: return "未知";
   }
 }
+
+// 获取用户类型标签类型
+function getUserTypeTagType(type) {
+  const typeMap = {
+    1: 'danger',   // 系统管理员
+    2: 'primary',  // 企业管理员
+    3: 'success',  // 部门管理员
+  };
+  return typeMap[type] || 'info';
+}
 // 表格专用的wrapper函数
 function tableUserTypeFormatter(row, column, cellValue, index) {
   return formatUserType(cellValue);
 }
-// 计算当前页的数据
+// 添加排序状态
+const sortOptions = reactive({
+  prop: 'user_type',
+  order: 'ascending'
+});
+
+// 处理排序变化
+const handleSortChange = ({ prop, order }) => {
+  sortOptions.prop = prop;
+  sortOptions.order = order;
+};
+
+// 显示密码
+const showPassword = (row) => {
+  selectedUser.value = row;
+  passwordDialogVisible.value = true;
+}
+
+// 排序后的数据
+const sortedData = computed(() => {
+  // 复制数组避免修改原数据
+  let sortedArray = [...user_data.user_array];
+
+  // 排序逻辑
+  if (sortOptions.prop) {
+    sortedArray.sort((a, b) => {
+      const aValue = a[sortOptions.prop];
+      const bValue = b[sortOptions.prop];
+
+      if (sortOptions.order === 'ascending') {
+        return aValue - bValue;
+      } else {
+        return bValue - aValue;
+      }
+    });
+  }
+  return sortedArray;
+});
+
+// 分页后的数据
 const paginatedData = computed(() => {
   const start = (user_data.page - 1) * user_data.pageSize;
   const end = start + user_data.pageSize;
-  return user_data.user_array.slice(start, end);
+  return sortedData.value.slice(start, end);
 });
+
+
 
 // 请求数据
 const userList = async () => {
+  tableLoading.value = true;
   try {
     const res = await axios.get('api/user/list');
-    console.log(res)
     // 假设返回的res包含数据对象data和总条数total
     if (res && res.data && Array.isArray(res.data)) {
       // 更新组织数据
@@ -184,8 +281,10 @@ const userList = async () => {
       new proxy.$tips('数据格式不正确', 'error').message_();
     }
   } catch (error) {
-    console.log(error)
-    new proxy.$tips('服务器发生错误','error').message_()
+    console.error(error)
+    new proxy.$tips('服务器发生错误，无法获取用户数据','error').message_()
+  } finally {
+    tableLoading.value = false;
   }
 };
 
@@ -194,25 +293,7 @@ const currentChange = (e) => {
   user_data.page = e; // 更新页码
 };
 
-// 打开新增对话框
-const openAddDialog = () => {
-  addDialogVisible.value = true;
-};
 
-// 新增记录
-const addRow = async () => {
-  try {
-    await axios.post('api/user/add', newRecord);
-    addDialogVisible.value = false;
-    userList(); // 刷新数据
-    // 清空新增表单
-    Object.keys(newRecord).forEach(key => {
-      newRecord[key] = '';
-    });
-  } catch (error) {
-    console.error('新增记录失败', error);
-  }
-};
 
 // 打开修改对话框
 const openEditDialog = (row) => {
@@ -222,25 +303,22 @@ const openEditDialog = (row) => {
 
 // 修改记录
 const updateRow = async () => {
+  if (!editFormRef.value) return;
+
   try {
+    const valid = await editFormRef.value.validate();
+    if (!valid) return;
+
+    submitLoading.value = true;
     await axios.put('api/user/update', editRecord);
+    new proxy.$tips('更新用户成功', 'success').message_();
     editDialogVisible.value = false;
-    userList(); // 刷新数据
+    await userList(); // 刷新数据
   } catch (error) {
     console.error('修改记录失败', error);
-  }
-};
-
-// 删除记录
-const deleteRow = async (user_id) => {
-  try {
-    if (confirm('确定要删除这条记录吗？')) {
-      await axios.delete(`api/user/delete/${user_id}`);
-      userList(); // 刷新数据
-      new proxy.$tips('删除记录成功', 'success').message_();
-    }
-  } catch (error) {
-    console.error('删除记录失败', error);
+    new proxy.$tips('更新用户失败', 'error').message_();
+  } finally {
+    submitLoading.value = false;
   }
 };
 
@@ -251,5 +329,93 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 页面布局 */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  color: #303133;
+}
+
+.heading .el-icon {
+  margin-right: 8px;
+  font-size: 24px;
+  color: #409EFF;
+}
+
+.main-content {
+  margin-bottom: 20px;
+}
+
+/* 表格样式 */
+.table-container {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.id-cell {
+  font-family: monospace;
+  color: #606266;
+  font-weight: 500;
+}
+
+.username-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.username-cell .el-icon {
+  color: #409EFF;
+}
+
+.password-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination-container {
+  padding: 15px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 表单样式 */
+.user-form {
+  margin-top: 10px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 15px;
+}
+
+/* 密码显示弹窗 */
+.password-display {
+  padding: 20px;
+  text-align: center;
+  font-size: 18px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
 
 </style>

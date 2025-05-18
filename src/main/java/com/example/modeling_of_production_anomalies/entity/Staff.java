@@ -12,10 +12,11 @@ public class Staff {
     private int dep_id;
     private String department;//部门
     private String hire_date;//入职日期
-    private String group1;//所属小组
+    private String group_name;//所属小组
+    private int group_id;
     private String group_leader;//组长
     private int com_id;
-    private String com_name;//部门
+    private String com_name;
 
     public int getId() {
         return id;
@@ -97,12 +98,20 @@ public class Staff {
         this.hire_date = hire_date;
     }
 
-    public String getGroup1() {
-        return group1;
+    public String getGroup_name() {
+        return group_name;
     }
 
-    public void setGroup1(String group1) {
-        this.group1 = group1;
+    public void setGroup_name(String group_name) {
+        this.group_name = group_name;
+    }
+
+    public int getGroup_id() {
+        return group_id;
+    }
+
+    public void setGroup_id(int group_id) {
+        this.group_id = group_id;
     }
 
     public String getGroup_leader() {
@@ -151,7 +160,8 @@ public class Staff {
                 ", dep_id=" + dep_id +
                 ", department='" + department + '\'' +
                 ", hire_date='" + hire_date + '\'' +
-                ", group1='" + group1 + '\'' +
+                ", group_name='" + group_name + '\'' +
+                ", group_id=" + group_id +
                 ", group_leader='" + group_leader + '\'' +
                 ", com_id=" + com_id +
                 ", com_name='" + com_name + '\'' +

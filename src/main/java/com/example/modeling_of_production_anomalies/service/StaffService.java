@@ -10,5 +10,8 @@ public interface StaffService {
     int addStaff(Staff staff);
     int updateStaff(Staff staff);
     int deleteById(int id);
+    int deleteByDepId(int dep_id);
+    int deleteByComId(int com_id);
+    List<Staff> getStaffByGroupName(String group_name);
 
 }

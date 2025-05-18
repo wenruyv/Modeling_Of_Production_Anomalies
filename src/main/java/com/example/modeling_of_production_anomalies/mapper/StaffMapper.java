@@ -2,6 +2,7 @@ package com.example.modeling_of_production_anomalies.mapper;
 
 import com.example.modeling_of_production_anomalies.entity.Staff;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,4 +15,9 @@ public interface StaffMapper {
     int addStaff(Staff staff);
     int updateStaff(Staff staff);
     int deleteById(int id);
+    int deleteByDepId(int dep_id);
+    int deleteByComId(int com_id);
+
+    @Select("select * from staff where group_name = #{group_name}")
+    List<Staff> getStaffByGroupName(String group_name);
 }

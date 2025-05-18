@@ -11,6 +11,7 @@ import java.util.List;
 public interface UserMapper {
     //查询
     User findByUsername(String username);
+    User findByUserId(int user_id);
     //列表展示
     List<User> UserList();
     int addUser(User user);

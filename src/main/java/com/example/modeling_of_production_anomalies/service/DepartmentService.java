@@ -10,6 +10,7 @@ public interface DepartmentService {
     Department selectByD_username(String d_username);
     Department selectDepById(int id);
     int updateDep(Department department);
+    int deleteDepByComId(int com_id);
     int deleteDepById(int id);
 
 }

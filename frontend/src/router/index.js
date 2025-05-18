@@ -23,9 +23,9 @@ const routes = [
                 component: () => import('@/page/organization/companyList.vue')
             },
             {
-                path: '/org', //树状图？？？
-                name: 'org',
-                component: () => import('@/page/organization/org.vue')
+                path: '/orgAll', //树状图？？？
+                name: 'orgAll',
+                component: () => import('@/page/organization/orgAll.vue')
             },
             {
                 path: '/resource', //
@@ -81,6 +81,16 @@ const routes = [
                 component: () => import('@/page/comPage/comProInfo.vue')
             },
             {
+                path: '/comEquipment', //企业组织结构图
+                name: 'comEquipment',
+                component: () => import('@/page/comPage/comEquipment.vue')
+            },
+            {
+                path: '/comMaterial', //企业组织结构图
+                name: 'comMaterial',
+                component: () => import('@/page/comPage/comMaterial.vue')
+            },
+            {
                 path: '/departmentList', //部门列表
                 name: 'departmentList',
                 component: () => import('@/page/comPage/departmentInfo.vue')
@@ -90,7 +100,16 @@ const routes = [
                 name: 'peopleList',
                 component: () => import('@/page/comPage/comStaff.vue')
             },
-
+            {
+                path: '/companyBpmn-viewer',
+                name: 'companyBpmn-viewer',
+                component: () => import('@/page/abnormity/bpmn-viewer.vue')
+            },
+            {
+                path: '/companyBpmn-modeler',
+                name: 'companyBpmn-modeler',
+                component: () => import('@/page/abnormity/bpmn-modeler.vue')
+            }
         ]
     },
     {   //部门index
@@ -113,6 +132,21 @@ const routes = [
                 path: '/depOrg', //部门信息
                 name: 'depOrg',
                 component: () => import('@/page/depPage/depOrg.vue')
+            },
+            {
+                path: '/depGroup1', //车间/小组信息
+                name: 'depGroup1',
+                component: () => import('@/page/depPage/depGroup1.vue')
+            },
+            {
+                path: '/depEquipment', //设备信息
+                name: 'depEquipment',
+                component: () => import('@/page/depPage/depEquipment.vue')
+            },
+            {
+                path: '/depMaterial', //原材料信息
+                name: 'depMaterial',
+                component: () => import('@/page/depPage/depMaterial.vue')
             },
             {
                 path: '/depStaff', //部门员工

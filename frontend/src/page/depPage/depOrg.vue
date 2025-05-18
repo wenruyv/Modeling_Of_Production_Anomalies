@@ -1,5 +1,10 @@
 <template>
-  <div class="heading">部门结构图</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><OfficeBuilding /></el-icon>
+      <span>部门结构图</span>
+    </div>
+  </div>
   <div style="height: 520px; width: 100%;">
     <el-tabs type="border-card">
       <el-tab-pane
@@ -24,12 +29,13 @@
 <script>
 import { ElSwitch, ElColorPicker } from 'element-plus'
 import {getCurrentInstance, onMounted, ref} from 'vue'
-
+import {OfficeBuilding} from "@element-plus/icons-vue";
 export default {
   name: "baseTree",
   components: {
     ElSwitch,
     ElColorPicker,
+    OfficeBuilding,
 
   },
   setup() {
@@ -45,51 +51,54 @@ export default {
     async function resTree() {
       try {
         const d_username = localStorage.getItem('d_username');
-        const res1 = await new proxy.$request(proxy.$urls.m().loadDep + '?d_username=' + d_username).modeget();
+        const res1 = await new proxy.$request(
+            proxy.$urls.m().loadDep + '?d_username=' + d_username
+        ).modeget();
+
         const com_id = res1.data.com_id;
         const targetDepName = res1.data.department;
 
-        const res = await new proxy.$request(proxy.$urls.m().orgById + '?id=' + com_id).modeget();
+        const res = await new proxy.$request(
+            proxy.$urls.m().orgById + '?id=' + com_id
+        ).modeget();
 
-        if (res?.data?.length) {
-          // 新方法：查找目标部门节点
-          const findTargetDepartment = (nodes) => {
-            for (const node of nodes) {
-              if (node.label === targetDepName) return node;
-              if (node.children) {
-                const found = findTargetDepartment(node.children);
+        if (res?.data) {
+          const orgData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+
+          // 查找目标部门
+          const findTargetDepartment = (node) => {
+            if (node.label === targetDepName) return node;
+            if (node.children) {
+              for (const child of node.children) {
+                const found = findTargetDepartment(child);
                 if (found) return found;
               }
             }
             return null;
           };
 
-          // 在所有部门树中搜索目标部门
-          let targetDep = null;
-          for (const dept of res.data) {
-            targetDep = findTargetDepartment([dept]);
-            if (targetDep) break;
-          }
+          const targetDep = findTargetDepartment(orgData);
 
-          // 如果找到目标部门，构造符合组件要求的单根树结构
           if (targetDep) {
-            dep.value = {
-              label: targetDep.label,
-              children: targetDep.children || [],
-              // 保留其他必要属性
-              ...targetDep
-            };
+            // 标准化数据结构
+            const normalizeNode = (node) => ({
+              ...node,
+              expand: true,
+              children: node.children ? node.children.map(normalizeNode) : []
+            });
+
+            dep.value = normalizeNode(targetDep);
+            console.log('最终树形数据:', dep.value);
           } else {
-            console.warn(`未找到匹配的部门: ${targetDepName}`);
+            console.warn('未找到部门:', targetDepName);
+            dep.value = { label: '无部门数据', children: [] }; // 空状态处理
           }
         }
       } catch (error) {
-        console.error('获取数据出错:', error);
-        new proxy.$tips('服务器发生错误', 'error').message_();
+        console.error('加载失败:', error);
+        dep.value = { label: '数据加载失败', children: [] };
       }
     }
-
-
     return {
       cloneNodeDrag,
       dep,

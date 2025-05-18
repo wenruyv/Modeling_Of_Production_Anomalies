@@ -19,6 +19,11 @@ public class ProInfoController {
     {
         return proInfoService.findInfoByC_id(c_id);
     }
+    @RequestMapping("/findById/{id}")
+    public ProInfo findInfoById(@PathVariable int id)
+    {
+        return proInfoService.findInfoById(id);
+    }
     @RequestMapping("/proList")
     public List<ProInfo> proInfoList()
     {
@@ -31,5 +36,9 @@ public class ProInfoController {
     @PostMapping("/update")
     public int updateProInfo(@RequestBody ProInfo proInfo){
         return proInfoService.updateProInfo(proInfo);
+    }
+    @DeleteMapping("/delete/{id}")
+    public int deleteProInfo(@PathVariable int id){
+        return proInfoService.deleteProInfo(id);
     }
 }

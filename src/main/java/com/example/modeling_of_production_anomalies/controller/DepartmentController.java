@@ -2,8 +2,10 @@ package com.example.modeling_of_production_anomalies.controller;
 
 import com.example.modeling_of_production_anomalies.entity.Company;
 import com.example.modeling_of_production_anomalies.entity.Department;
+import com.example.modeling_of_production_anomalies.entity.Staff;
 import com.example.modeling_of_production_anomalies.entity.User;
 import com.example.modeling_of_production_anomalies.service.DepartmentService;
+import com.example.modeling_of_production_anomalies.service.StaffService;
 import com.example.modeling_of_production_anomalies.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,8 @@ public class DepartmentController {
     private DepartmentService departmentService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private StaffService staffService;
     @RequestMapping("/list")
     public List<Department> getDepList(@RequestParam int com_id ){
         List<Department> list = departmentService.depList(com_id);
@@ -79,8 +83,20 @@ public class DepartmentController {
     public int deleteDepById(@PathVariable int id){
         Department department = departmentService.selectDepById(id);
         User user = userService.findByUsername(department.getD_username());
+        //1删除账户
         int result = userService.deleteUserById(user.getUser_id());
-        if(result == 1) return departmentService.deleteDepById(id);
-        else return 0;
+        List<Staff> staff = staffService.depStaffList(id);
+        int delete;
+        if(staff != null)
+        //2删除部门员工
+            delete = staffService.deleteByDepId(id);
+        else
+            delete = 1;
+        //3删除部门
+        int deleteDep = departmentService.deleteDepById(id);
+        if(result == 1 && delete == 1 && deleteDep == 1)
+            return 1;
+        else
+            return 0;
     }
 }

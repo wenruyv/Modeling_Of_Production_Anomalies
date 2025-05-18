@@ -3,8 +3,7 @@ package com.example.modeling_of_production_anomalies.controller;
 import com.example.modeling_of_production_anomalies.entity.Company;
 import com.example.modeling_of_production_anomalies.entity.Organization;
 import com.example.modeling_of_production_anomalies.entity.User;
-import com.example.modeling_of_production_anomalies.service.OrganizationService;
-import com.example.modeling_of_production_anomalies.service.UserService;
+import com.example.modeling_of_production_anomalies.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +18,12 @@ public class OrganizationController {
     private OrganizationService organizationService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private DepartmentService departmentService;
+    @Autowired
+    private StaffService staffService;
+    @Autowired
+    private ProInfoService proInfoService;
     // 获取树形结构数据
     @GetMapping("/tree")
     public List<Organization> getTree() {
@@ -60,6 +65,11 @@ public class OrganizationController {
     }
     @PostMapping("/addCompany")
     public int addCompany(@RequestBody Company company){
+        User user = userService.findByUsername(company.getC_username());
+        if(user != null){
+            //存在同名
+            return 2;
+        }
         int newCom = organizationService.addCompany(company);
         User cuser = new User();
         //设置企业管理员
@@ -83,12 +93,25 @@ public class OrganizationController {
     }
     @PostMapping("/updateCompany")
     public int updateCompany(@RequestBody Company company) {
+        Company oldCom = organizationService.findById(company.getId());//找到旧的公司值
+        if (oldCom == null) return 0;
+        //更新公司信息
         int result = organizationService.updateCompany(company);
-        if (result == 1) {
-            return result;
-        } else {
-            return 0;
+        //3. 检查并更新用户
+        String oldUsername = oldCom.getC_username();
+
+        String oldPassword = oldCom.getC_password();
+        String newUsername = company.getC_username();
+        String newPassword = company.getC_password();
+        if (oldUsername != newUsername || oldPassword !=newPassword) {
+            User user = userService.findByUsername(oldUsername);
+            if(user != null){
+                user.setUsername(newUsername);
+                user.setPassword(newPassword);
+                userService.updateUser(user);
+            }
         }
+        return result;
     }
     @PostMapping("/updateC_org")
     public int updateC_org(@RequestParam String c_username, @RequestParam String c_org) {
@@ -113,9 +136,10 @@ public class OrganizationController {
     public int deleteById(@PathVariable int id){
         Company company = organizationService.findById(id);
         User user = userService.findByUsername(company.getC_username());
-        int result = userService.deleteUserById(user.getUser_id());
-        if(result == 1) return organizationService.deleteById(id);
-        else return 0;
-
+        int deUser = userService.deleteUserById(user.getUser_id());//删除公司管理员
+        int deDep = departmentService.deleteDepByComId(company.getId());//删除部门
+        int deStaff = staffService.deleteByComId(company.getId());//删除公司员工
+        int deProInfo = proInfoService.deleteByComId(company.getId());//删除公司生产信息
+        return organizationService.deleteById(id);
     }
 }

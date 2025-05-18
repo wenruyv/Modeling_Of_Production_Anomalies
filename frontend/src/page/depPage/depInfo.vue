@@ -1,5 +1,10 @@
 <template>
-  <div class="heading">部门信息</div>
+  <div class="page-header">
+    <div class="heading">
+      <el-icon><Document /></el-icon>
+      <span>部门信息</span>
+    </div>
+  </div>
   <div>
     <el-card class="box-card" style="width: 100%;" :body-style="{ padding: '20px' }">
       <el-form :model="dep" label-width="120px" style="padding-right: 10px">
@@ -68,7 +73,7 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="管理员账号" prop="d_username">
-                <el-input v-model="tempDep.d_username" />
+                <el-input v-model="tempDep.d_username" disabled/>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -90,7 +95,7 @@
             </el-col>
           </el-row>
           <el-form-item label="部门介绍" prop="introduction">
-            <el-input v-model="tempDep.description" type="textarea" readonly/>
+            <el-input v-model="tempDep.description" type="textarea"/>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -110,8 +115,9 @@
 
 <script>
 import { getCurrentInstance, reactive, ref, onMounted } from 'vue';
-
+import { Document} from '@element-plus/icons-vue';
 export default {
+  components:{Document},
   setup() {
     const { proxy } = getCurrentInstance();
 
