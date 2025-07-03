@@ -139,7 +139,6 @@ components:{OfficeBuilding, Menu,User,Document},
       },
       {
         id: '8',
-        icon: WarningFilled,
         title: '异常建模',
         router: '',
         Subclass: [
